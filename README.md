@@ -1,5 +1,11 @@
 # Themes of Shibbir
 
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/shibbirweb.themes-of-shibbir?label=Marketplace&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/shibbirweb.themes-of-shibbir?label=Installs&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/shibbirweb.themes-of-shibbir?label=Rating&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir&ssr=false#review-details)
+[![Open VSX](https://img.shields.io/open-vsx/v/shibbirweb/themes-of-shibbir?label=Open%20VSX&color=1B222A)](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
+[![License](https://img.shields.io/badge/License-MIT-1B222A)](LICENSE)
+
 Two dark themes for Visual Studio Code, built around different ideas about depth.
 
 They are not light and dark variants of one palette. Each has its own colors, so
@@ -25,6 +31,17 @@ lightest editor background. Syntax colors are muted and desaturated to match.
 Pick this if you like being able to tell panes apart at a glance without reading
 them, and prefer a softer palette for long sessions.
 
+## Where it is published
+
+| Registry | Listing | Identifier |
+| --- | --- | --- |
+| Visual Studio Marketplace | [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir) | `shibbirweb.themes-of-shibbir` |
+| Open VSX | [open-vsx.org](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir) | `shibbirweb/themes-of-shibbir` |
+
+Both listings carry the same build. Open VSX is what VSCodium, Cursor, Gitpod,
+Eclipse Theia, and other non-Microsoft builds read from, so the extension
+installs there as well as in VS Code.
+
 ## Install
 
 From the Extensions view in VS Code, search for **Themes of Shibbir** and click
@@ -36,11 +53,14 @@ From the command line:
 code --install-extension shibbirweb.themes-of-shibbir
 ```
 
-The extension is published to both the
-[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
-and [Open VSX](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir), so
-it also installs in VSCodium, Cursor, Gitpod, and other editors that use the
-Open VSX registry.
+For an editor that uses Open VSX, install it from that editor's own Extensions
+view, or download the `.vsix` from the
+[Open VSX listing](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
+and run:
+
+```sh
+codium --install-extension themes-of-shibbir-0.0.1.vsix
+```
 
 ## Activate
 
