@@ -4,6 +4,7 @@
   "description": "Themes of Md. Shibbir Ahmed",
   "version": "0.0.1",
   "publisher": "shibbirweb",
+  "icon": "icon.png",
   "packageManager": "pnpm@11.9.0",
   "license": "MIT",
   "author": {
