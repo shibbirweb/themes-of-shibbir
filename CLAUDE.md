@@ -32,7 +32,7 @@ git ls-files -z | xargs -0 perl -CSD -ne 'print "$ARGV:$.\n" if /[\x{2014}\x{201
 There are no npm scripts and no `node_modules`. Everything is either an editor action or a one-off `npx`.
 
 - **Dev loop:** press `F5` to launch an Extension Development Host (the `Extension` config in `.vscode/launch.json`, `type: extensionHost`). Edits to the theme JSON apply live in that window; no reload needed.
-- **Activate a theme** in the host window: `Cmd+K Cmd+T`, then "Themes of Shibbir: Dark solid" or "Themes of Shibbir: Dark shades". Switch between them in that same picker to compare.
+- **Activate a theme** in the host window: `Cmd+K Cmd+T`, then "Themes of Shibbir: Dark Solid" or "Themes of Shibbir: Dark Shades". Switch between them in that same picker to compare.
 - **Find the right scope before adding a token rule:** Command Palette → `Developer: Inspect Editor Tokens and Scopes`.
 - **Package a `.vsix`:** `npx @vscode/vsce package` (vsce is not a devDependency). The `.vsix` is gitignored.
 - **Install locally without packaging:** copy the folder into `~/.vscode/extensions` and restart VS Code.
@@ -43,27 +43,42 @@ The extension contributes two themes, registered in `contributes.themes` in `pac
 
 | Label in the picker | File | Character |
 | --- | --- | --- |
-| Themes of Shibbir: Dark solid | `themes/dark-solid-color-theme.json` | one flat surface color everywhere, vivid saturated syntax |
-| Themes of Shibbir: Dark shades | `themes/dark-shades-color-theme.json` | layered surfaces at five depths, muted desaturated syntax |
+| Themes of Shibbir: Dark Solid | `themes/dark-solid-color-theme.json` | one flat surface color everywhere, vivid saturated syntax |
+| Themes of Shibbir: Dark Shades | `themes/dark-shades-color-theme.json` | layered surfaces at five depths, muted desaturated syntax |
 
 Every theme label carries the `Themes of Shibbir: ` prefix so all of them group together in the Color Theme picker, which sorts alphabetically. Keep that prefix on any theme added later, and keep the `name` inside each JSON file identical to its `label` in `package.json`.
 
 They are **independent palettes**, not variants of each other. A color change in one does not imply the same change in the other.
 
-Each file has three parts: `colors` for workbench chrome, `tokenColors` for TextMate scope rules, and `"type": "dark"` at the top.
+Each file has four parts: `colors` for workbench chrome, `tokenColors` for TextMate scope rules, `semanticTokenColors` for language-server tokens, and `"type": "dark"` plus `"semanticHighlighting": true` at the top.
+
+### Why the engine floor is 1.12, and why it stays there
+
+`engines.vscode` is `^1.12.0`: the release that introduced workbench `colors`, and therefore the oldest VS Code on which both halves of these files do something. The range has no upper bound, so current and future releases are covered without ever bumping it.
+
+**Do not raise it just because a newer feature gets used.** Themes are data, not code. VS Code applies the properties and color keys it recognises and silently ignores the rest, so newer constructs degrade instead of failing:
+
+- `semanticHighlighting` and `semanticTokenColors` need 1.43. Below that they are skipped and syntax coloring falls back to `tokenColors`.
+- Recent color keys (chat, inline chat, command center, source control graph, sticky scroll, inlay hints) are dropped by builds that predate them, leaving VS Code's own defaults for that chrome.
+
+Neither case errors, warns, or blocks installation. The precedent is Dracula, a themes-only extension that declares `^1.13.0` while shipping `inlineChat.*` keys from 2023.
+
+The floor was briefly raised to `^1.43.0` and deliberately reverted. Maximum installability, including on forks and pinned corporate installs that report older base versions, is worth more here than declaring an exact feature floor. Raise it only if a theme ever depends on something that genuinely breaks when absent.
 
 ### Current state: skeletons, built up over time
 
-Both files are deliberately minimal right now. Each carries `editor.background`, `editor.foreground`, `sideBar.background`, and a single `comment` token rule. Shibbir extends them incrementally, so **do not bulk-generate rules into these files unless asked**. Add what the current task needs and nothing more.
+Both files are deliberately minimal right now. Each carries `editor.background`, `editor.foreground`, `sideBar.background`, a single `comment` token rule, and a full `semanticTokenColors` block. Shibbir extends them incrementally, so **do not bulk-generate rules into these files unless asked**. Add what the current task needs and nothing more.
+
+The `semanticTokenColors` block is the one exception to that minimalism: it was filled in on request, and it draws every value from the reference palettes below.
 
 Two conventions to preserve while they grow:
 
 - **Keep the two files structurally parallel.** Same workbench keys, same token rule names, in the same order. Only the hex values differ. If you add a rule to one, add the matching rule to the other, or the files stop being diffable against each other.
-- **Keep each theme's identity in its surfaces.** Dark solid uses one flat value for every surface key, which is why `sideBar.background` currently equals `editor.background`. Dark shades layers its surfaces, which is why its two differ. Any surface key added later has to respect that: identical values in solid, stepped values in shades.
+- **Keep each theme's identity in its surfaces.** Dark Solid uses one flat value for every surface key, which is why `sideBar.background` currently equals `editor.background`. Dark Shades layers its surfaces, which is why its two differ. Any surface key added later has to respect that: identical values in solid, stepped values in shades.
 
 The tables below are the **reference palettes**, not an inventory of what the files contain today. They record the intended role for each hex so colors stay consistent as rules are added. Reuse a hex from the relevant table rather than introducing a new one.
 
-### Dark solid palette
+### Dark Solid palette
 
 Surfaces are deliberately uniform. As surface keys get added (`activityBar`, `panel`, `statusBar`, `titleBar`, both tab states), they all take `#1E2227`, separated only by `#2C3238` borders. Introducing a second surface color defeats the point of the theme.
 
@@ -80,7 +95,7 @@ Surfaces are deliberately uniform. As surface keys get added (`activityBar`, `pa
 | `#E06C75` | variables, tags, diff deleted |
 | `#FF5370` | invalid |
 
-### Dark shades palette
+### Dark Shades palette
 
 Surfaces step through five depths, darkest chrome to lightest editor: `#10151A` status bar, `#12171C` activity and title bar, `#151B21` panel and terminal, `#161C22` sidebar and widgets, `#1B222A` editor. Only the editor and sidebar steps exist in the file so far. That ordering is the theme's identity; place any new surface key at its correct depth.
 

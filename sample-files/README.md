@@ -2,7 +2,7 @@
 
 Test fixtures for eyeballing the themes. Open these in the Extension Development
 Host (`F5`), then check each file under **both** contributed themes: "Themes of
-Shibbir: Dark solid" and "Themes of Shibbir: Dark shades". Switching themes with
+Shibbir: Dark Solid" and "Themes of Shibbir: Dark Shades". Switching themes with
 the same file open, via `Cmd+K Cmd+T`, is the fastest side-by-side comparison
 available.
 
@@ -108,9 +108,16 @@ gets its own file. Property names should render `#B2CCD6` in all of them.
   `markup.deleted`, and `markup.changed` rules, which are otherwise only visible
   in a live git diff.
 - **`sample.csv`** doubles as the reference palette for both themes: one row per
-  intended token rule, with the Dark solid and Dark shades hex side by side. The
+  intended token rule, with the Dark Solid and Dark Shades hex side by side. The
   theme files are skeletons being built up over time, so treat this as the target
-  rather than a description of what they currently contain.
+  rather than a description of what they currently contain. It covers TextMate
+  `tokenColors` only; `semanticTokenColors` is a separate mechanism and is
+  already fully defined in both theme files.
+- **`typescript.ts`** is the fixture for semantic highlighting. TypeScript ships
+  a semantic token provider, so classes, interfaces, enums, decorators, and
+  `readonly` members there resolve through `semanticTokenColors` rather than
+  through the TextMate rules. `Developer: Inspect Editor Tokens and Scopes` shows
+  a "semantic token type" line when that is happening.
 - **Italic rules** are comments, `variable.language` (`this`, `self`, `$this`),
   decorators, markdown italic, and markdown quotes, so confirm your font has a
   real italic face. `invalid.deprecated` is the only strikethrough rule.

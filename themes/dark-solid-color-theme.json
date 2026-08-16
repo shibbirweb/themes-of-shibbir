@@ -1,6 +1,29 @@
 {
-	"name": "Themes of Shibbir: Dark solid",
+	"name": "Themes of Shibbir: Dark Solid",
 	"type": "dark",
+	"semanticHighlighting": true,
+	"semanticTokenColors": {
+		"namespace": "#E5C07B",
+		"class": "#E5C07B",
+		"interface": "#E5C07B",
+		"enum": "#E5C07B",
+		"struct": "#E5C07B",
+		"type": "#E5C07B",
+		"typeParameter": "#E5C07B",
+		"function": "#61AFEF",
+		"method": "#61AFEF",
+		"event": "#61AFEF",
+		"decorator": "#61AFEF",
+		"macro": "#C678DD",
+		"parameter": "#D19A66",
+		"enumMember": "#D19A66",
+		"variable": "#E06C75",
+		"property": "#D9E0E8",
+		"*.readonly": "#D19A66",
+		"*.deprecated": {
+			"strikethrough": true
+		}
+	},
 	"colors": {
 		"editor.background": "#1E2227",
 		"editor.foreground": "#D9E0E8",

@@ -31,15 +31,21 @@ jobs:
         with:
           node-version: 22
 
-      # Once pnpm-lock.yaml is committed, switch this to
-      # "pnpm install --frozen-lockfile" and add "cache: pnpm" to setup-node above.
+      # pnpm turns --frozen-lockfile on by default whenever CI is set, so a bare
+      # "pnpm install" here would abort with ERR_PNPM_NO_LOCKFILE while no
+      # pnpm-lock.yaml is committed. Once one is, drop this flag and add
+      # "cache: pnpm" to setup-node above.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Verify the release was cut from main
         run: |
+          # Compare against FETCH_HEAD, not origin/main. A release event checks
+          # out a tag, so the remote-tracking ref refs/remotes/origin/main is not
+          # guaranteed to exist and "origin/main" can fail to resolve. FETCH_HEAD
+          # is always written by the fetch on the line above.
           git fetch --no-tags origin main
-          if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+          if git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD; then
             echo "Release commit $GITHUB_SHA is on main."
           else
             echo "::error::Release commit $GITHUB_SHA is not on main. Publish releases from main only."
@@ -92,7 +98,12 @@ jobs:
       - name: Publish to VS Code Marketplace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: pnpm exec vsce publish --no-dependencies --packagePath "themes-of-shibbir-${TAG}.vsix"
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "::error::Repository secret VSCE_PAT is not set. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          pnpm exec vsce publish --no-dependencies --packagePath "themes-of-shibbir-${TAG}.vsix"
 
       - name: Ensure Open VSX namespace
         if: ${{ env.OVSX_PAT != '' }}
