@@ -1,7 +1,12 @@
 .vscode/**
 .vscode-test/**
+.github/**
+node_modules/**
 .gitignore
 .gitattributes
 vsc-extension-quickstart.md
 sample-files/**
+dist/**
 CLAUDE.md
+package-lock.json
+pnpm-lock.yaml

@@ -1,0 +1,110 @@
+name: Publish Extension
+
+# Publishes to the VS Code Marketplace and Open VSX whenever a GitHub Release is
+# published. Create the release from the main branch after bumping the version in
+# package.json to match the release tag.
+#
+# Required repository secrets:
+#   VSCE_PAT  Azure DevOps token with Marketplace > Manage scope.
+#   OVSX_PAT  Open VSX token. Both Open VSX steps are skipped when it is unset.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write # upload the .vsix as a release asset
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # needed to prove the release commit is on main
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Once pnpm-lock.yaml is committed, switch this to
+      # "pnpm install --frozen-lockfile" and add "cache: pnpm" to setup-node above.
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Verify the release was cut from main
+        run: |
+          git fetch --no-tags origin main
+          if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Release commit $GITHUB_SHA is on main."
+          else
+            echo "::error::Release commit $GITHUB_SHA is not on main. Publish releases from main only."
+            exit 1
+          fi
+
+      - name: Verify version matches release tag
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${TAG#v}"
+          echo "package.json=$PKG_VERSION  release=$TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version ($PKG_VERSION) does not match release tag ($TAG_VERSION). Bump the version before releasing."
+            exit 1
+          fi
+
+      # This repo has no source to lint, so the equivalent guard is checking that
+      # every contributed theme resolves to a file that parses.
+      - name: Validate contributed themes
+        run: |
+          node -e '
+            const fs = require("fs");
+            const themes = (require("./package.json").contributes || {}).themes || [];
+            if (themes.length === 0) {
+              console.error("::error::package.json contributes no themes.");
+              process.exit(1);
+            }
+            let failed = false;
+            for (const entry of themes) {
+              const file = entry.path.replace(/^\.\//, "");
+              if (!fs.existsSync(file)) {
+                console.error(`::error::Missing theme file ${file} for label "${entry.label}".`);
+                failed = true;
+                continue;
+              }
+              try {
+                const theme = JSON.parse(fs.readFileSync(file, "utf8"));
+                console.log(`OK ${entry.label} -> ${file} (${Object.keys(theme.colors || {}).length} colors, ${(theme.tokenColors || []).length} token rules)`);
+              } catch (error) {
+                console.error(`::error::${file} is not valid JSON: ${error.message}`);
+                failed = true;
+              }
+            }
+            process.exit(failed ? 1 : 0);
+          '
+
+      - name: Package VSIX
+        run: pnpm exec vsce package --no-dependencies -o "themes-of-shibbir-${TAG}.vsix"
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: pnpm exec vsce publish --no-dependencies --packagePath "themes-of-shibbir-${TAG}.vsix"
+
+      - name: Ensure Open VSX namespace
+        if: ${{ env.OVSX_PAT != '' }}
+        # First publish for a publisher requires the namespace to exist; ignore
+        # the error on later runs when it already does.
+        run: pnpm exec ovsx create-namespace shibbirweb -p "$OVSX_PAT" || true
+
+      - name: Publish to Open VSX
+        if: ${{ env.OVSX_PAT != '' }}
+        run: pnpm exec ovsx publish "themes-of-shibbir-${TAG}.vsix" -p "$OVSX_PAT"
+
+      - name: Attach VSIX to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" "themes-of-shibbir-${TAG}.vsix" --clobber

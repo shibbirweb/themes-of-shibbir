@@ -1,13 +1,37 @@
 {
   "name": "themes-of-shibbir",
   "displayName": "Themes of Shibbir",
-  "description": "Themes of MD. Shibbir Ahmed",
+  "description": "Themes of Md. Shibbir Ahmed",
   "version": "0.0.1",
+  "publisher": "shibbirweb",
+  "packageManager": "pnpm@11.9.0",
+  "license": "MIT",
+  "author": {
+    "name": "Md. Shibbir Ahmed",
+    "email": "shibbirweb@gmail.com",
+    "url": "https://shibbirweb.github.io"
+  },
+  "sponsor": {
+    "url": "https://buymeacoffee.com/shibbirweb"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shibbirweb/themes-of-shibbir"
+  },
+  "bugs": {
+    "url": "https://github.com/shibbirweb/themes-of-shibbir/issues"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },
   "categories": [
     "Themes"
+  ],
+  "keywords": [
+    "theme",
+    "color-theme",
+    "dark",
+    "dark-theme"
   ],
   "contributes": {
     "themes": [
@@ -22,5 +46,14 @@
         "path": "./themes/dark-shades-color-theme.json"
       }
     ]
+  },
+  "scripts": {
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies",
+    "publish:ovsx": "ovsx publish --no-dependencies"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.9.2",
+    "ovsx": "^1.0.2"
   }
 }
