@@ -1,0 +1,21 @@
+# pnpm settings. Not a workspace definition, this is just where pnpm 10 reads
+# its configuration from now.
+#
+# pnpm 10 refuses to run a dependency's install scripts until they are reviewed,
+# and strictDepBuilds defaults to true, which turns that refusal into a failed
+# install (ERR_PNPM_IGNORED_BUILDS) rather than a warning.
+#
+# Neither of the two scripts it flags is needed to package or publish a theme:
+#
+#   keytar             optional credential store for vsce. The workflow passes
+#                      the token explicitly, so no keychain is ever touched.
+#   @vscode/vsce-sign  signing helper. The Marketplace signs server side.
+#
+# They are marked false rather than true on purpose. keytar is archived and has
+# no prebuilt binary for Node 22, so allowing its build would fall back to
+# compiling against libsecret, which ubuntu-latest does not ship.
+strictDepBuilds: false
+
+allowBuilds:
+  '@vscode/vsce-sign': false
+  keytar: false
