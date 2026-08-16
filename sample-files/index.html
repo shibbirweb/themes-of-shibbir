@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- HTML sample: tags, attributes, entities, and embedded CSS and JS. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Themes of Shibbir preview</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <style>
+      :root {
+        --background: #263238;
+        --foreground: #eeffff;
+      }
+
+      body {
+        margin: 0;
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: "Fira Code", monospace;
+      }
+    </style>
+  </head>
+
+  <body class="preview" data-theme="dark" data-version="1.0.0">
+    <header id="masthead" role="banner">
+      <h1>Palette&nbsp;preview</h1>
+      <p>Colors &amp; scopes &lt;rendered&gt; below.</p>
+    </header>
+
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Token</th>
+            <th scope="col">Hex</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Keyword</td>
+            <td><code>#C792EA</code></td>
+          </tr>
+          <tr>
+            <td>String</td>
+            <td><code>#C3E88D</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <form action="/search" method="get" novalidate>
+        <label for="query">Filter</label>
+        <input id="query" name="q" type="search" placeholder="Search colors" required />
+        <select name="sort">
+          <option value="name" selected>Name</option>
+          <option value="hex">Hex</option>
+        </select>
+        <textarea name="notes" rows="3" cols="40">Optional notes</textarea>
+        <button type="submit" disabled>Search</button>
+      </form>
+
+      <img src="./swatch.png" alt="Swatch preview" width="120" height="120" />
+      <a href="https://code.visualstudio.com/api/extension-guides/color-theme" target="_blank" rel="noopener">
+        Color theme docs
+      </a>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('tbody tr');
+
+        rows.forEach((row, index) => {
+          row.dataset.index = String(index);
+          row.addEventListener('click', function handleClick() {
+            this.classList.toggle('is-selected');
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

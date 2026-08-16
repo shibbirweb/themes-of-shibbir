@@ -1,0 +1,86 @@
+// Protocol Buffers sample: messages, enums, services, options, maps.
+
+syntax = "proto3";
+
+package shibbir.themes.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/shibbir/themes/gen/v1;themesv1";
+option java_package = "com.shibbir.themes.v1";
+option java_multiple_files = true;
+
+enum UiTheme {
+  UI_THEME_UNSPECIFIED = 0;
+  UI_THEME_LIGHT = 1;
+  UI_THEME_DARK = 2;
+}
+
+enum FontStyle {
+  FONT_STYLE_UNSPECIFIED = 0;
+  FONT_STYLE_NORMAL = 1;
+  FONT_STYLE_ITALIC = 2;
+  FONT_STYLE_BOLD = 3;
+  FONT_STYLE_UNDERLINE = 4;
+}
+
+message Swatch {
+  string id = 1;
+  string label = 2;
+  string hex = 3;
+  FontStyle font_style = 4;
+  repeated string scopes = 5;
+  google.protobuf.Timestamp created_at = 6;
+
+  reserved 7, 8;
+  reserved "legacy_color";
+}
+
+message Theme {
+  string id = 1;
+  string name = 2;
+  UiTheme ui_theme = 3;
+  bool published = 4;
+  optional double rating = 5;
+  repeated Swatch swatches = 6;
+  map<string, string> workbench_colors = 7;
+
+  oneof source {
+    string file_path = 8;
+    bytes raw_json = 9;
+  }
+}
+
+message GetThemeRequest {
+  string theme_id = 1;
+}
+
+message ListThemesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  bool published_only = 3;
+}
+
+message ListThemesResponse {
+  repeated Theme themes = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message UpdateThemeRequest {
+  Theme theme = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message StreamSwatchesRequest {
+  string theme_id = 1;
+}
+
+service ThemeService {
+  rpc GetTheme(GetThemeRequest) returns (Theme);
+  rpc ListThemes(ListThemesRequest) returns (ListThemesResponse);
+  rpc UpdateTheme(UpdateThemeRequest) returns (Theme);
+  rpc StreamSwatches(StreamSwatchesRequest) returns (stream Swatch);
+  rpc UploadSwatches(stream Swatch) returns (Theme);
+}

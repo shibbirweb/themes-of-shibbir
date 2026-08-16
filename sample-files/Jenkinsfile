@@ -1,0 +1,122 @@
+// Jenkinsfile sample: declarative pipeline in Groovy.
+
+@Library('shared-pipeline@main') _
+
+def themeFile = 'themes/Themes of Shibbir-color-theme.json'
+def notify = { String status -> echo "Build ${status}: ${env.JOB_NAME} #${env.BUILD_NUMBER}" }
+
+pipeline {
+    agent {
+        docker {
+            image 'node:22-alpine'
+            args '-u root:root'
+        }
+    }
+
+    options {
+        timeout(time: 20, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    parameters {
+        choice(name: 'TARGET', choices: ['vs-dark', 'vs'], description: 'Base UI theme')
+        booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish to the Marketplace')
+        string(name: 'VERSION', defaultValue: '', description: 'Override the package version')
+    }
+
+    environment {
+        CI = 'true'
+        NODE_ENV = 'production'
+        VSCE_TOKEN = credentials('vsce-marketplace-token')
+    }
+
+    triggers {
+        cron('H 3 * * 1')
+        pollSCM('H/15 * * * *')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.SHORT_SHA = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                }
+            }
+        }
+
+        stage('Validate') {
+            parallel {
+                stage('Theme JSON') {
+                    steps {
+                        sh """
+                            node -e 'JSON.parse(require("fs").readFileSync("${themeFile}", "utf8"))'
+                        """
+                    }
+                }
+
+                stage('Manifest') {
+                    steps {
+                        sh 'node -e "require(\'./package.json\')"'
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            when {
+                anyOf {
+                    branch 'main'
+                    expression { return params.PUBLISH }
+                }
+            }
+            steps {
+                script {
+                    def version = params.VERSION ?: sh(
+                        script: "node -p \"require('./package.json').version\"",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Packaging version ${version} for ${params.TARGET}"
+                    sh "npx @vscode/vsce package --out dist/theme-${version}.vsix"
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'dist/*.vsix', fingerprint: true
+                }
+            }
+        }
+
+        stage('Publish') {
+            when {
+                allOf {
+                    branch 'main'
+                    expression { params.PUBLISH == true }
+                }
+            }
+            steps {
+                withCredentials([string(credentialsId: 'vsce-marketplace-token', variable: 'TOKEN')]) {
+                    sh 'npx @vscode/vsce publish --pat $TOKEN'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            notify('succeeded')
+        }
+        failure {
+            notify('failed')
+            mail to: 'shibbirweb@gmail.com',
+                 subject: "Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "See ${env.BUILD_URL}"
+        }
+    }
+}

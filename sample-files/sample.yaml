@@ -1,0 +1,66 @@
+# YAML sample: anchors, aliases, block scalars, nested maps and sequences.
+
+version: '3.9'
+
+x-defaults: &defaults
+  restart: unless-stopped
+  environment:
+    TZ: Asia/Dhaka
+    LOG_LEVEL: debug
+
+theme:
+  name: Themes of Shibbir
+  ui_theme: vs-dark
+  version: 1.0.0
+  published: false
+  rating: 4.75
+  installs: 1_200
+  released_at: 2026-08-16
+  maintainer: null
+
+  colors:
+    editor.background: '#263238'
+    editor.foreground: '#eeffff'
+    activityBarBadge.background: '#007acc'
+    sideBarTitle.foreground: '#bbbbbb'
+
+  token_colors:
+    - name: Comment
+      scope:
+        - comment
+        - punctuation.definition.comment
+      settings:
+        fontStyle: italic
+        foreground: '#546E7A'
+
+    - name: Keyword, Storage
+      scope: [keyword, storage.type, storage.modifier]
+      settings:
+        foreground: '#C792EA'
+
+services:
+  api:
+    <<: *defaults
+    image: node:22-alpine
+    command: ['npm', 'run', 'start']
+    ports:
+      - '3000:3000'
+    depends_on:
+      - cache
+
+  cache:
+    <<: *defaults
+    image: redis:7-alpine
+
+description: >
+  A folded block scalar. Newlines in the source are folded
+  into spaces when the value is parsed.
+
+license: |
+  A literal block scalar.
+  Line breaks are preserved exactly as written.
+      Including this indented line.
+
+flags:
+  - --extensionDevelopmentPath=.
+  - --disable-extensions

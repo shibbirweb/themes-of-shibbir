@@ -1,0 +1,74 @@
+/*
+ * PostCSS sample. The theme targets `source.postcss support.type.property-name`.
+ * Uses syntax that plain CSS does not have: nesting, custom selectors,
+ * custom media queries, and plugin at-rules.
+ */
+
+@import 'variables.pcss';
+
+@custom-media --medium (min-width: 768px);
+@custom-media --large (min-width: 1200px);
+
+@custom-selector :--interactive button, a, input, select, textarea;
+
+:root {
+  --background: #263238;
+  --foreground: #eeffff;
+  --accent: #82aaff;
+  --spacing: 8px;
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 3);
+  background-color: var(--background);
+  color: var(--foreground);
+
+  & .palette__title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  & .palette__swatch {
+    aspect-ratio: 1 / 1;
+    background-color: var(--accent);
+    transition: transform 150ms ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      transform: scale(1.02);
+      outline: 2px solid var(--accent);
+    }
+
+    &.is-active::after {
+      content: '\2713';
+      position: absolute;
+    }
+  }
+
+  @media (--medium) {
+    gap: calc(var(--spacing) * 3);
+  }
+}
+
+:--interactive {
+  font-family: inherit;
+  color: inherit;
+}
+
+@supports (display: grid) {
+  .palette {
+    grid-auto-flow: dense;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

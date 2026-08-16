@@ -1,0 +1,87 @@
+// LESS sample. The theme has a dedicated rule for `source.less
+// support.type.property-name`, so property names here should render in
+// #B2CCD6, distinct from their values.
+
+@import (reference) 'variables.less';
+
+@background: #263238;
+@foreground: #eeffff;
+@accent: #82aaff;
+@spacing: 8px;
+@breakpoint-medium: 768px;
+
+@min768: ~'(min-width: 768px)';
+
+.rounded(@radius: 4px) {
+  border-radius: @radius;
+  overflow: hidden;
+}
+
+.card-base() {
+  box-shadow: 0 2px 6px fade(#000000, 35%);
+  background-color: darken(@background, 3%);
+}
+
+#palette-ids {
+  .primary {
+    color: @accent;
+  }
+}
+
+.palette {
+  .card-base();
+  .rounded(6px);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: (@spacing * 2);
+  padding: (@spacing * 3);
+  background-color: @background;
+  color: @foreground;
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: lighten(@foreground, 5%);
+  }
+
+  &__swatch {
+    aspect-ratio: 1 / 1;
+    background-color: @accent;
+    cursor: pointer;
+    transition: transform 150ms ease-in-out;
+
+    &:hover,
+    &:focus-visible {
+      transform: scale(1.02);
+      outline: 2px solid @accent;
+    }
+
+    &.is-active::after {
+      content: '\2713';
+      position: absolute;
+    }
+  }
+
+  @media @min768 {
+    gap: (@spacing * 3);
+  }
+}
+
+.generate-tokens(@index) when (@index > 0) {
+  .token--@{index} {
+    margin-top: (@spacing * @index);
+  }
+  .generate-tokens(@index - 1);
+}
+
+.generate-tokens(4);
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

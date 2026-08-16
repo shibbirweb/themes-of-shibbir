@@ -1,0 +1,102 @@
+// SCSS sample: variables, nesting, mixins, functions, control directives.
+// This theme colors SCSS property names differently from values, so nested
+// rules are a good place to check contrast.
+
+@use 'sass:color';
+@import 'variables';
+
+$background: #263238;
+$foreground: #eeffff;
+$accent: #82aaff;
+$spacing: 8px;
+$breakpoints: (
+  'small': 480px,
+  'medium': 768px,
+  'large': 1200px,
+);
+
+@mixin respond-to($breakpoint) {
+  $value: map-get($breakpoints, $breakpoint);
+
+  @if $value {
+    @media (min-width: $value) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}";
+  }
+}
+
+@function rem($pixels, $base: 16px) {
+  @return math.div($pixels, $base) * 1rem;
+}
+
+%card-base {
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.palette {
+  @extend %card-base;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: $spacing * 2;
+  padding: rem(24px);
+  background-color: $background;
+  color: $foreground;
+  transition: opacity 200ms ease-in-out;
+
+  &__title {
+    font-size: rem(20px);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  &__swatch {
+    aspect-ratio: 1 / 1;
+    background-color: color.adjust($accent, $lightness: -10%);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      outline: 2px solid $accent;
+      transform: scale(1.02);
+    }
+
+    &.is-active::after {
+      content: '\2713';
+      position: absolute;
+      inset: auto 4px 4px auto;
+    }
+  }
+
+  > .palette__row + .palette__row {
+    margin-top: $spacing;
+  }
+
+  @include respond-to('medium') {
+    gap: $spacing * 3;
+  }
+}
+
+@each $name, $hex in ('keyword': #c792ea, 'string': #c3e88d, 'number': #f78c6c) {
+  .token--#{$name} {
+    color: $hex;
+  }
+}
+
+@for $i from 1 through 4 {
+  .mt-#{$i} {
+    margin-top: $spacing * $i;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

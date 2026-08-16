@@ -1,0 +1,110 @@
+# GitHub Actions sample. Different enough from sample.yaml to be worth its own
+# file: expression syntax, matrix strategies, and multi-line run blocks.
+
+name: Package theme
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'themes/**'
+      - 'package.json'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to the Marketplace'
+        type: boolean
+        default: false
+      version:
+        description: 'Version override'
+        type: string
+        required: false
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: production
+  THEME_FILE: themes/Themes of Shibbir-color-theme.json
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['20', '22']
+        include:
+          - node-version: '22'
+            primary: true
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Validate theme JSON
+        run: |
+          node -e '
+            const fs = require("fs");
+            const theme = JSON.parse(fs.readFileSync(process.env.THEME_FILE, "utf8"));
+            console.log(`${theme.tokenColors.length} token rules`);
+          '
+
+      - name: Check for forbidden characters
+        run: |
+          if git ls-files -z | xargs -0 perl -CSD -ne 'exit 1 if /[\x{2014}\x{2013}]/'; then
+            echo "clean"
+          else
+            echo "::error::em-dash or en-dash found"
+            exit 1
+          fi
+
+  package:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || inputs.publish
+
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        name: Read version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Package
+        run: npx @vscode/vsce package --out "dist/theme-${{ steps.meta.outputs.version }}.vsix"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: dist/*.vsix
+          retention-days: 30
+
+      - name: Publish
+        if: inputs.publish == true
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx @vscode/vsce publish --pat "$VSCE_PAT"

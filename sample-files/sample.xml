@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML sample: declaration, namespaces, attributes, CDATA, entities. -->
+<!DOCTYPE theme SYSTEM "theme.dtd">
+
+<theme xmlns="https://example.com/schema/theme"
+       xmlns:ui="https://example.com/schema/ui"
+       version="1.0.0"
+       id="themes-of-shibbir">
+
+  <?processing-instruction target="value"?>
+
+  <metadata>
+    <name>Themes of Shibbir</name>
+    <author email="shibbirweb@gmail.com">Md. Shibbir Ahmed</author>
+    <description><![CDATA[
+      A dark theme based on the Material Ocean palette.
+      CDATA lets us write <tags> & ampersands without escaping.
+    ]]></description>
+    <published>false</published>
+    <rating>4.75</rating>
+  </metadata>
+
+  <ui:colors>
+    <ui:color key="editor.background" value="#263238" />
+    <ui:color key="editor.foreground" value="#eeffff" />
+    <ui:color key="activityBarBadge.background" value="#007acc" />
+    <ui:color key="sideBarTitle.foreground" value="#bbbbbb" />
+  </ui:colors>
+
+  <tokenColors>
+    <token name="Comment" fontStyle="italic" foreground="#546E7A">
+      <scope>comment</scope>
+      <scope>punctuation.definition.comment</scope>
+    </token>
+
+    <token name="Keyword, Storage" foreground="#C792EA">
+      <scope>keyword</scope>
+      <scope>storage.type</scope>
+      <scope>storage.modifier</scope>
+    </token>
+
+    <token name="String" foreground="#C3E88D">
+      <scope>string</scope>
+      <!-- Entities: &lt; &gt; &amp; &quot; &apos; -->
+      <note>Applies to &quot;quoted&quot; text &amp; symbols.</note>
+    </token>
+  </tokenColors>
+
+  <empty-element />
+</theme>

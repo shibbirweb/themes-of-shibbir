@@ -1,0 +1,74 @@
+Diff sample: the theme colors added lines green, removed lines red, and
+changed markers purple, so this file is the quickest way to check that the
+git gutter and inline diff colors read correctly.
+
+diff --git a/themes/Themes of Shibbir-color-theme.json b/themes/Themes of Shibbir-color-theme.json
+index 1a2b3c4..5d6e7f8 100644
+--- a/themes/Themes of Shibbir-color-theme.json
++++ b/themes/Themes of Shibbir-color-theme.json
+@@ -1,10 +1,14 @@
+ {
+ 	"name": "Themes of Shibbir",
+ 	"colors": {
+ 		"editor.background": "#263238",
+ 		"editor.foreground": "#eeffff",
+-		"activityBarBadge.background": "#007acc",
+-		"sideBarTitle.foreground": "#bbbbbb"
++		"activityBarBadge.background": "#82AAFF",
++		"sideBarTitle.foreground": "#B2CCD6",
++		"statusBar.background": "#1e272c",
++		"tab.activeBorder": "#C792EA",
++		"terminal.foreground": "#EEFFFF"
+ 	},
+ 	"tokenColors": [
+ 		{
+ 			"name": "Comment",
+
+@@ -18,6 +22,12 @@
+ 			"settings": {
+ 				"fontStyle": "italic",
+ 				"foreground": "#546E7A"
+ 			}
+ 		},
++		{
++			"name": "Punctuation",
++			"scope": ["punctuation.separator", "punctuation.terminator"],
++			"settings": {
++				"foreground": "#89DDFF"
++			}
++		},
+ 		{
+ 			"name": "Variables",
+
+diff --git a/package.json b/package.json
+index 9f8e7d6..3c2b1a0 100644
+--- a/package.json
++++ b/package.json
+@@ -3,7 +3,7 @@
+   "displayName": "Themes of Shibbir",
+   "description": "Themes of Md. Shibbir Ahmed",
+-  "version": "0.0.1",
++  "version": "0.1.0",
+   "engines": {
+     "vscode": "^1.125.0"
+   },
+
+diff --git a/sample-files/removed.txt b/sample-files/removed.txt
+deleted file mode 100644
+index 4a5b6c7..0000000
+--- a/sample-files/removed.txt
++++ /dev/null
+@@ -1,3 +0,0 @@
+-This entire file was deleted.
+-Every line shows as a removal.
+-Useful for checking the deleted-line color.
+
+diff --git a/sample-files/added.txt b/sample-files/added.txt
+new file mode 100644
+index 0000000..8d9e0f1
+--- /dev/null
++++ b/sample-files/added.txt
+@@ -0,0 +1,3 @@
++This entire file is new.
++Every line shows as an addition.
++Useful for checking the inserted-line color.

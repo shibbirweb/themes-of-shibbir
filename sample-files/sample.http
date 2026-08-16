@@ -1,0 +1,82 @@
+### HTTP request sample, for the REST Client style of .http file.
+### Each block separated by ### is a separate request.
+
+@baseUrl = http://localhost:8000/api
+@version = v1
+@token = PLACEHOLDER_TOKEN_NOT_REAL
+@themeId = 42
+
+### List published themes
+
+GET {{baseUrl}}/{{version}}/themes?published=true&per_page=20 HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+X-Request-Id: 7f3c1a90-0b2e-4d5f-9a11-6c8e2d4b0f31
+
+### Fetch a single theme
+
+GET {{baseUrl}}/{{version}}/themes/{{themeId}} HTTP/1.1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Create a swatch
+
+POST {{baseUrl}}/{{version}}/themes/{{themeId}}/swatches HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "keyword",
+  "hex": "#C792EA",
+  "fontStyle": "normal",
+  "scopes": [
+    "keyword",
+    "storage.type",
+    "storage.modifier"
+  ]
+}
+
+### Partially update a theme
+
+PATCH {{baseUrl}}/{{version}}/themes/{{themeId}} HTTP/1.1
+Content-Type: application/merge-patch+json
+Authorization: Bearer {{token}}
+
+{
+  "isPublished": true,
+  "rating": 4.75
+}
+
+### Upload a packaged extension
+
+POST {{baseUrl}}/{{version}}/themes/{{themeId}}/package HTTP/1.1
+Content-Type: multipart/form-data; boundary=----BoundaryABC123
+Authorization: Bearer {{token}}
+
+------BoundaryABC123
+Content-Disposition: form-data; name="notes"
+
+Initial release
+------BoundaryABC123
+Content-Disposition: form-data; name="file"; filename="theme.vsix"
+Content-Type: application/octet-stream
+
+< ./dist/theme.vsix
+------BoundaryABC123--
+
+### Delete a swatch
+
+DELETE {{baseUrl}}/{{version}}/themes/{{themeId}}/swatches/7 HTTP/1.1
+Authorization: Bearer {{token}}
+
+### GraphQL over HTTP
+
+POST {{baseUrl}}/graphql HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "query": "query GetTheme($themeId: ID!) { theme(themeId: $themeId) { id name uiTheme } }",
+  "variables": { "themeId": "42" }
+}

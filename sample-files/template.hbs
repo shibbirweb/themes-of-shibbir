@@ -1,0 +1,54 @@
+{{!-- Handlebars sample: expressions, block helpers, partials, comments. --}}
+{{!-- Mustache-style templating shares these scopes with many other engines. --}}
+
+<section class="palette" data-theme="{{theme.uiTheme}}">
+  <h1>{{theme.name}}</h1>
+
+  {{! Escaped output, then raw output. }}
+  <p>{{theme.description}}</p>
+  <div class="rich">{{{theme.htmlDescription}}}</div>
+
+  {{#if theme.isPublished}}
+    <span class="badge badge--live">Published</span>
+  {{else if theme.isDraft}}
+    <span class="badge badge--muted">Draft</span>
+  {{else}}
+    <span class="badge badge--empty">Unpublished</span>
+  {{/if}}
+
+  {{#unless user.isGuest}}
+    <a href="/themes/{{theme.id}}/edit" class="btn">Edit</a>
+  {{/unless}}
+
+  <ul class="palette__list">
+    {{#each swatches as |swatch index|}}
+      <li class="palette__item {{#if @first}}is-first{{/if}} {{#if @last}}is-last{{/if}}">
+        <span class="swatch" style="background-color: {{swatch.hex}}"></span>
+        <strong>{{swatch.label}}</strong>
+        <code>{{uppercase swatch.hex}}</code>
+        <small>{{add index 1}} of {{@root.total}}</small>
+
+        {{#with swatch.settings}}
+          {{#if fontStyle}}
+            <em>{{fontStyle}}</em>
+          {{/if}}
+        {{/with}}
+      </li>
+    {{else}}
+      <li class="palette__item palette__item--empty">Nothing to show.</li>
+    {{/each}}
+  </ul>
+
+  {{#each tokenGroups}}
+    <section>
+      <h2>{{capitalize @key}}</h2>
+      {{> tokenList tokens=this accent=../theme.accent}}
+    </section>
+  {{/each}}
+
+  {{> footer count=swatches.length year=2026}}
+
+  {{#compare swatches.length ">" 0}}
+    <p>{{swatches.length}} {{pluralize swatches.length "swatch" "swatches"}}</p>
+  {{/compare}}
+</section>

@@ -1,0 +1,51 @@
+# TOML sample: tables, arrays of tables, inline tables, typed values.
+
+title = "Themes of Shibbir"
+version = "1.0.0"
+published = false
+rating = 4.75
+installs = 1_200
+released = 2026-08-16
+released_at = 2026-08-16T20:07:00+06:00
+multiline = """
+A multi-line basic string.
+Escapes work here: \t tab, \u00E9 unicode.
+"""
+literal = 'No \escapes\ processed here.'
+literal_multiline = '''
+Raw multi-line: C:\Users\shibbir\theme
+'''
+
+[package]
+name = "themes-of-shibbir"
+engines = { vscode = "^1.125.0" }
+categories = ["Themes"]
+
+[colors]
+"editor.background" = "#263238"
+"editor.foreground" = "#eeffff"
+"activityBarBadge.background" = "#007acc"
+
+[[token_colors]]
+name = "Comment"
+scope = ["comment", "punctuation.definition.comment"]
+
+  [token_colors.settings]
+  fontStyle = "italic"
+  foreground = "#546E7A"
+
+[[token_colors]]
+name = "Keyword, Storage"
+scope = ["keyword", "storage.type", "storage.modifier"]
+
+  [token_colors.settings]
+  foreground = "#C792EA"
+
+[build]
+targets = [
+  "vs-dark",
+  "vs",
+]
+flags = ["--no-git-tag-version", "--out", "dist/theme.vsix"]
+timeout_seconds = 120
+retries = 3

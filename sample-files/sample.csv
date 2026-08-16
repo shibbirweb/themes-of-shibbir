@@ -1,0 +1,31 @@
+scope,label,hex,font_style,depth,is_active,notes
+comment,Comment,#546E7A,italic,0,true,"Includes punctuation.definition.comment"
+variable,Variables,#EEFFFF,normal,0,true,
+constant.other.color,Colors,#ffffff,normal,0,false,"Dead rule, overridden by Operator Misc"
+invalid,Invalid,#FF5370,normal,0,true,"Also covers invalid.illegal"
+keyword,"Keyword, Storage",#C792EA,normal,0,true,"Comma inside a quoted field"
+keyword.control,"Operator, Misc",#89DDFF,normal,0,true,"Wins over the Colors rule"
+entity.name.tag,Tag,#f07178,normal,0,true,
+entity.name.function,"Function, Special Method",#82AAFF,normal,0,true,
+constant.numeric,Number,#F78C6C,normal,0,true,"Also constants and parameters"
+string,String,#C3E88D,normal,0,true,"Quote inside a field: ""quoted"""
+entity.name,"Class, Support",#FFCB6B,normal,0,true,"support.type here is overridden below"
+support.type,Entity Types,#B2CCD6,normal,0,true,"Wins over Class Support for support.type"
+variable.language,Language methods,#FF5370,italic,0,true,
+entity.other.attribute-name,Attributes,#C792EA,normal,0,true,
+markup.inserted,Inserted,#C3E88D,normal,0,true,
+markup.deleted,Deleted,#FF5370,normal,0,true,
+markup.changed,Changed,#C792EA,normal,0,true,
+string.regexp,Regular Expressions,#89DDFF,normal,0,true,
+source.json,JSON Key Level 0,#C792EA,normal,0,true,
+source.json,JSON Key Level 1,#FFCB6B,normal,1,true,
+source.json,JSON Key Level 2,#F78C6C,normal,2,true,
+source.json,JSON Key Level 3,#FF5370,normal,3,true,
+source.json,JSON Key Level 4,#C17E70,normal,4,true,"Only rule using this hex"
+source.json,JSON Key Level 5,#82AAFF,normal,5,true,
+source.json,JSON Key Level 6,#f07178,normal,6,true,
+source.json,JSON Key Level 7,#C792EA,normal,7,true,
+source.json,JSON Key Level 8,#C3E88D,normal,8,true,
+markup.bold,Markup Bold,#f07178,bold,0,true,
+markup.italic,Markup Italic,#f07178,italic,0,true,
+markup.underline,Markup Underline,#F78C6C,underline,0,true,

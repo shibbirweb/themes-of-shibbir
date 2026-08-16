@@ -1,0 +1,100 @@
+// Prisma sample: datasource, generator, models, enums, attributes, relations.
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+enum UiTheme {
+  VS
+  VS_DARK
+}
+
+enum FontStyle {
+  NORMAL
+  ITALIC
+  BOLD
+  UNDERLINE
+}
+
+enum Role {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(191)
+  name      String?  @db.VarChar(120)
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  themes Theme[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Theme {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(120)
+  slug        String   @unique
+  uiTheme     UiTheme  @default(VS_DARK) @map("ui_theme")
+  isPublished Boolean  @default(false) @map("is_published")
+  rating      Decimal? @db.Decimal(3, 2)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  authorId Int   @map("author_id")
+  author   User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  swatches Swatch[]
+  tags     TagsOnThemes[]
+
+  @@unique([authorId, name])
+  @@index([isPublished, createdAt])
+  @@map("themes")
+}
+
+model Swatch {
+  id        Int       @id @default(autoincrement())
+  label     String    @db.VarChar(60)
+  hex       String    @db.Char(7)
+  fontStyle FontStyle @default(NORMAL) @map("font_style")
+  scopes    Json?
+  depth     Int       @default(0) @db.SmallInt
+
+  themeId Int   @map("theme_id")
+  theme   Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([themeId, label])
+  @@index([themeId])
+  @@map("swatches")
+}
+
+model Tag {
+  id     Int            @id @default(autoincrement())
+  name   String         @unique @db.VarChar(40)
+  themes TagsOnThemes[]
+
+  @@map("tags")
+}
+
+model TagsOnThemes {
+  themeId    Int      @map("theme_id")
+  tagId      Int      @map("tag_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([themeId, tagId])
+  @@map("tags_on_themes")
+}

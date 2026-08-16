@@ -1,0 +1,119 @@
+"""
+GraphQL sample: schema definition, operations, fragments, directives.
+"""
+
+scalar DateTime
+scalar Hex
+
+directive @auth(requires: Role = VIEWER) on FIELD_DEFINITION | OBJECT
+
+enum Role {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+enum UiTheme {
+  VS
+  VS_DARK
+}
+
+interface Node {
+  id: ID!
+  createdAt: DateTime!
+}
+
+type Swatch implements Node {
+  id: ID!
+  createdAt: DateTime!
+  label: String!
+  hex: Hex!
+  fontStyle: String
+  tags: [String!]!
+}
+
+type Theme implements Node @auth(requires: EDITOR) {
+  id: ID!
+  createdAt: DateTime!
+  name: String!
+  uiTheme: UiTheme!
+  published: Boolean!
+  rating: Float
+  swatches(first: Int = 20, after: String): SwatchConnection!
+}
+
+type SwatchConnection {
+  edges: [SwatchEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type SwatchEdge {
+  cursor: String!
+  node: Swatch!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+union SearchResult = Theme | Swatch
+
+input CreateSwatchInput {
+  themeId: ID!
+  label: String!
+  hex: Hex!
+  tags: [String!] = []
+}
+
+type Query {
+  theme(themeId: ID!): Theme
+  themes(published: Boolean = true, first: Int = 10): [Theme!]!
+  search(query: String!): [SearchResult!]!
+}
+
+type Mutation {
+  createSwatch(input: CreateSwatchInput!): Swatch! @auth(requires: EDITOR)
+  publishTheme(themeId: ID!): Theme!
+}
+
+type Subscription {
+  swatchAdded(themeId: ID!): Swatch!
+}
+
+fragment SwatchFields on Swatch {
+  id
+  label
+  hex
+  fontStyle
+}
+
+query GetTheme($themeId: ID!, $first: Int = 20, $withSwatches: Boolean! = true) {
+  theme(themeId: $themeId) {
+    id
+    name
+    uiTheme
+    rating
+    swatches(first: $first) @include(if: $withSwatches) {
+      totalCount
+      edges {
+        cursor
+        node {
+          ...SwatchFields
+          tags
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}
+
+mutation AddSwatch($input: CreateSwatchInput!) {
+  createSwatch(input: $input) {
+    ...SwatchFields
+  }
+}
