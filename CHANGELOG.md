@@ -1,9 +1,37 @@
 # Change Log
 
-All notable changes to the "themes-of-shibbir" extension will be documented in this file.
+All notable changes to the Themes of Shibbir extension are documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
+this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-- Initial release
+Work in progress on both themes: workbench chrome (activity bar, panel, status
+bar, tabs, terminal, git decorations) and the full set of TextMate token rules.
+
+## [0.0.1] - 2026-08-16
+
+First release. Both themes are early and cover the editor surface, comments, and
+semantic tokens. Areas that are not styled yet fall back to the built-in dark
+theme.
+
+### Added
+
+- **Themes of Shibbir: Dark Solid**, a dark theme that keeps every surface on one
+  flat color so nothing but the code carries contrast.
+- **Themes of Shibbir: Dark Shades**, a dark theme that steps its surfaces
+  through separate depths so panes are distinguishable at a glance.
+- Editor background, editor foreground, and sidebar background for both themes.
+- Italic comments, in each theme's own muted tone.
+- Semantic highlighting, with 18 semantic token colors per theme covering
+  namespaces, classes, interfaces, enums, structs, types, type parameters,
+  functions, methods, events, decorators, macros, parameters, enum members,
+  variables, properties, readonly modifiers, and deprecated symbols.
+- Support for VS Code 1.12 and newer. Semantic highlighting applies on 1.43 and
+  newer; older builds ignore it and fall back to TextMate rules.
+- Published to both the Visual Studio Marketplace and Open VSX, so the themes
+  install in VSCodium, Cursor, Gitpod, and other Open VSX editors.
+
+[Unreleased]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/shibbirweb/themes-of-shibbir/releases/tag/v0.0.1
