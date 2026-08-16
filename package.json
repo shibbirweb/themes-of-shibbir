@@ -1,0 +1,21 @@
+{
+  "name": "themes-of-shibbir",
+  "displayName": "Themes of Shibbir",
+  "description": "Themes of MD. Shibbir Ahmed",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Themes of Shibbir",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Themes of Shibbir-color-theme.json"
+      }
+    ]
+  }
+}
