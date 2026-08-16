@@ -1,8 +1,13 @@
 # Sample files
 
-Test fixtures for eyeballing the theme. Open these in the Extension Development
-Host (`F5`) with "Themes of Shibbir" active and check that every construct reads
-clearly against `#263238`.
+Test fixtures for eyeballing the themes. Open these in the Extension Development
+Host (`F5`), then check each file under **both** contributed themes: "Themes of
+Shibbir: Dark solid" and "Themes of Shibbir: Dark shades". Switching themes with
+the same file open, via `Cmd+K Cmd+T`, is the fastest side-by-side comparison
+available.
+
+The two themes are independent palettes, so a construct that reads well in one
+can still be wrong in the other.
 
 These files are excluded from the packaged `.vsix` by `.vscodeignore`. Nothing
 here is wired into a build; they exist only to be looked at.
@@ -91,23 +96,24 @@ gets its own file. Property names should render `#B2CCD6` in all of them.
 ## Things worth checking specifically
 
 - **`nested.json`** is the one file that cannot be replaced by a real project
-  file. The theme defines nine separate JSON key colors by nesting depth, and the
-  `level0_key` through `level8_key` chain is the only way to see all nine at once.
-- **`styles.sass`** is the only fixture that reaches the `source.sass
-  keyword.control` rule, which is the theme's oddly named "CSS ID's" entry.
-- **`sample.php`** exercises the PHP-specific scopes the theme calls out by name
+  file. Themes commonly color JSON keys per nesting depth using progressively
+  longer selector chains, and the `level0_key` through `level8_key` ladder is the
+  only way to check every level at once. Neither theme defines those rules yet.
+- **`sample.php`** exercises the PHP-specific scopes the themes call out by name
   (`support.other.namespace.use.php`, `meta.use.php`,
   `punctuation.separator.inheritance.php`).
-- **`markdown-showcase.md`** covers roughly a third of the theme's token rules on
-  its own, including the fenced-code-block rules that are overridden later in the
-  theme file.
+- **`markdown-showcase.md`** covers seven of the token rules on its own, more than
+  any other single fixture.
 - **`sample.diff`** is the fastest check for the `markup.inserted`,
   `markup.deleted`, and `markup.changed` rules, which are otherwise only visible
   in a live git diff.
-- **`sample.csv`** doubles as a written inventory of the theme's token rules,
-  including which ones are dead or overridden.
-- **Comments and `variable.language`** (`this`, `self`, `$this`) are the two
-  italic rules, so confirm your font has a real italic face.
+- **`sample.csv`** doubles as the reference palette for both themes: one row per
+  intended token rule, with the Dark solid and Dark shades hex side by side. The
+  theme files are skeletons being built up over time, so treat this as the target
+  rather than a description of what they currently contain.
+- **Italic rules** are comments, `variable.language` (`this`, `self`, `$this`),
+  decorators, markdown italic, and markdown quotes, so confirm your font has a
+  real italic face. `invalid.deprecated` is the only strikethrough rule.
 - **`Makefile`** recipes must stay tab-indented. If your editor converts tabs to
   spaces on save, the file stops being a valid Makefile even though it still
   highlights correctly.

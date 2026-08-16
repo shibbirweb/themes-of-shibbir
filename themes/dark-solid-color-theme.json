@@ -1,0 +1,21 @@
+{
+	"name": "Themes of Shibbir: Dark solid",
+	"type": "dark",
+	"colors": {
+		"editor.background": "#1E2227",
+		"editor.foreground": "#D9E0E8",
+		"sideBar.background": "#1E2227"
+	},
+	"tokenColors": [
+		{
+			"name": "Comment",
+			"scope": [
+				"comment"
+			],
+			"settings": {
+				"fontStyle": "italic",
+				"foreground": "#5C6773"
+			}
+		}
+	]
+}

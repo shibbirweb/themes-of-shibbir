@@ -12,9 +12,14 @@
   "contributes": {
     "themes": [
       {
-        "label": "Themes of Shibbir",
+        "label": "Themes of Shibbir: Dark solid",
         "uiTheme": "vs-dark",
-        "path": "./themes/Themes of Shibbir-color-theme.json"
+        "path": "./themes/dark-solid-color-theme.json"
+      },
+      {
+        "label": "Themes of Shibbir: Dark shades",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dark-shades-color-theme.json"
       }
     ]
   }

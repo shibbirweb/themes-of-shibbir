@@ -1,0 +1,21 @@
+{
+	"name": "Themes of Shibbir: Dark shades",
+	"type": "dark",
+	"colors": {
+		"editor.background": "#1B222A",
+		"editor.foreground": "#C3CBD5",
+		"sideBar.background": "#161C22"
+	},
+	"tokenColors": [
+		{
+			"name": "Comment",
+			"scope": [
+				"comment"
+			],
+			"settings": {
+				"fontStyle": "italic",
+				"foreground": "#556070"
+			}
+		}
+	]
+}

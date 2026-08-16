@@ -1,31 +1,35 @@
-scope,label,hex,font_style,depth,is_active,notes
-comment,Comment,#546E7A,italic,0,true,"Includes punctuation.definition.comment"
-variable,Variables,#EEFFFF,normal,0,true,
-constant.other.color,Colors,#ffffff,normal,0,false,"Dead rule, overridden by Operator Misc"
-invalid,Invalid,#FF5370,normal,0,true,"Also covers invalid.illegal"
-keyword,"Keyword, Storage",#C792EA,normal,0,true,"Comma inside a quoted field"
-keyword.control,"Operator, Misc",#89DDFF,normal,0,true,"Wins over the Colors rule"
-entity.name.tag,Tag,#f07178,normal,0,true,
-entity.name.function,"Function, Special Method",#82AAFF,normal,0,true,
-constant.numeric,Number,#F78C6C,normal,0,true,"Also constants and parameters"
-string,String,#C3E88D,normal,0,true,"Quote inside a field: ""quoted"""
-entity.name,"Class, Support",#FFCB6B,normal,0,true,"support.type here is overridden below"
-support.type,Entity Types,#B2CCD6,normal,0,true,"Wins over Class Support for support.type"
-variable.language,Language methods,#FF5370,italic,0,true,
-entity.other.attribute-name,Attributes,#C792EA,normal,0,true,
-markup.inserted,Inserted,#C3E88D,normal,0,true,
-markup.deleted,Deleted,#FF5370,normal,0,true,
-markup.changed,Changed,#C792EA,normal,0,true,
-string.regexp,Regular Expressions,#89DDFF,normal,0,true,
-source.json,JSON Key Level 0,#C792EA,normal,0,true,
-source.json,JSON Key Level 1,#FFCB6B,normal,1,true,
-source.json,JSON Key Level 2,#F78C6C,normal,2,true,
-source.json,JSON Key Level 3,#FF5370,normal,3,true,
-source.json,JSON Key Level 4,#C17E70,normal,4,true,"Only rule using this hex"
-source.json,JSON Key Level 5,#82AAFF,normal,5,true,
-source.json,JSON Key Level 6,#f07178,normal,6,true,
-source.json,JSON Key Level 7,#C792EA,normal,7,true,
-source.json,JSON Key Level 8,#C3E88D,normal,8,true,
-markup.bold,Markup Bold,#f07178,bold,0,true,
-markup.italic,Markup Italic,#f07178,italic,0,true,
-markup.underline,Markup Underline,#F78C6C,underline,0,true,
+rule,scope,dark_solid_hex,dark_shades_hex,font_style,notes
+Comment,comment,#5C6773,#556070,italic,"Also punctuation.definition.comment"
+Variable,variable,#E06C75,#C08A8F,normal,
+"Variable, other",variable.other.object,#D9E0E8,#C3CBD5,normal,"Object keys and readwrite vars"
+Language variable,variable.language,#C678DD,#A98CC8,italic,"this, self, $this"
+"Keyword, storage",keyword,#C678DD,#A98CC8,normal,"Also storage.type and storage.modifier"
+"Operator, punctuation",keyword.operator,#56B6C2,#6FA3A8,normal,"Separators, terminators, braces"
+Function,entity.name.function,#61AFEF,#7BA7CC,normal,"Also support.function and calls"
+Function parameter,variable.parameter,#D19A66,#C39B72,normal,
+"Class, type, support",entity.name.type,#E5C07B,#C9B285,normal,"Also inherited classes"
+String,string,#98C379,#8FB98A,normal,"Includes symbols and keys"
+Escape character,constant.character.escape,#56B6C2,#6FA3A8,normal,"Shared with string.regexp"
+"Number, constant",constant.numeric,#D19A66,#C39B72,normal,"Also constant.language and units"
+Invalid,invalid,#FF5370,#C96A6A,normal,"Also invalid.illegal"
+Deprecated,invalid.deprecated,#D19A66,#C39B72,strikethrough,"Only strikethrough rule in either theme"
+Tag,entity.name.tag,#E06C75,#C08A8F,normal,
+Tag punctuation,punctuation.definition.tag,#5C6773,#556070,normal,"Deliberately dimmer than the tag name"
+Attribute name,entity.other.attribute-name,#D19A66,#C39B72,normal,
+CSS property name,source.css support.type.property-name,#61AFEF,#7BA7CC,normal,"Covers css, sass, scss, less, stylus, postcss"
+CSS class and id,entity.other.attribute-name.class,#E5C07B,#C9B285,normal,
+PHP namespace,support.other.namespace.use.php,#E5C07B,#C9B285,normal,"Includes the inheritance separator"
+Decorator,meta.decorator,#61AFEF,#7BA7CC,italic,
+"JSON key, level 0",source.json support.type.property-name.json,#61AFEF,#7BA7CC,normal,"Top level keys"
+"JSON key, level 1",source.json support.type.property-name.json,#C678DD,#A98CC8,normal,"One level of nesting"
+"JSON key, level 2+",source.json support.type.property-name.json,#E5C07B,#C9B285,normal,"Ancestor match, so levels 3 to 8 land here too"
+Markdown heading,markup.heading,#61AFEF,#7BA7CC,bold,
+Markdown bold,markup.bold,#D19A66,#C39B72,bold,
+Markdown italic,markup.italic,#C678DD,#A98CC8,italic,
+Markdown link,markup.underline.link,#56B6C2,#6FA3A8,underline,
+Markdown quote,markup.quote,#5C6773,#556070,italic,
+Markdown raw and fenced code,markup.inline.raw,#98C379,#8FB98A,normal,
+Markdown list punctuation,punctuation.definition.list.begin.markdown,#5C6773,#556070,normal,"Also meta.separator"
+Diff inserted,markup.inserted,#98C379,#8FB98A,normal,"See sample.diff"
+Diff deleted,markup.deleted,#E06C75,#C08A8F,normal,"See sample.diff"
+Diff changed,markup.changed,#E5C07B,#C9B285,normal,"See sample.diff"
