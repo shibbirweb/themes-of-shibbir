@@ -57,14 +57,16 @@ jobs:
         run: pnpm exec vsce package --no-dependencies -o themes-of-shibbir.vsix
 
       # Fails if the package gains a file outside the allowlist (a stray
-      # node_modules or tools folder, say) or loses a contributed theme.
+      # node_modules or tools folder, say) or loses a contributed theme. The
+      # listing goes to RUNNER_TEMP: written inside the repo, the shell creates
+      # it before vsce runs, so vsce would list the listing itself.
       - name: Verify package contents
         run: |
-          pnpm exec vsce ls --no-dependencies > vsix-files.txt
-          cat vsix-files.txt
+          pnpm exec vsce ls --no-dependencies > "$RUNNER_TEMP/vsix-files.txt"
+          cat "$RUNNER_TEMP/vsix-files.txt"
           node -e '
             const fs = require("fs");
-            const listed = fs.readFileSync("vsix-files.txt", "utf8").split("\n").map((line) => line.trim()).filter(Boolean);
+            const listed = fs.readFileSync(`${process.env.RUNNER_TEMP}/vsix-files.txt`, "utf8").split("\n").map((line) => line.trim()).filter(Boolean);
             const allowed = [/^package\.json$/, /^README\.md$/, /^CHANGELOG\.md$/, /^LICENSE$/, /^icon\.png$/, /^themes\/[^/]+\.json$/];
             let failed = false;
             for (const file of listed) {
