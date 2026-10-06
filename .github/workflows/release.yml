@@ -1,0 +1,176 @@
+# Starts a release: Actions, "Release", Run workflow, on main.
+#
+# It bumps the version in package.json, moves the [Unreleased] changelog entries
+# under a dated heading, updates the README's install example, and opens a
+# release pull request into main, like `chore: release 0.2.0`, with the release
+# notes in its description. Merging it is the decision to release. Once CI
+# passes on main, publish.yml publishes to the VS Code Marketplace and Open VSX
+# and creates the GitHub release and tag.
+#
+# Level "auto" reads the conventional commits since the last release: any feat
+# makes a minor release, otherwise any fix, perf, refactor or style makes a
+# patch, and a "!" after the type makes a major. Docs, chore, ci and test
+# commits alone call for no release, so auto refuses; pick a level to release
+# anyway.
+#
+# Tick "dry run" to see the version and notes it would use, with nothing pushed
+# or opened. Needs the repository setting Settings, Actions, General, "Allow
+# GitHub Actions to create and approve pull requests".
+name: Release
+run-name: Release ${{ inputs.level }}${{ inputs.dry_run && ' (dry run)' || '' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: Version bump
+        type: choice
+        options: [auto, patch, minor, major]
+        default: auto
+      dry_run:
+        description: Dry run, only show what would happen and push or open nothing
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Read CI's result on main, and start CI on the release branch.
+  actions: write
+
+concurrency:
+  group: release-pull-request
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Open the release pull request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only from main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Releases are cut from main, and this was started on ${GITHUB_REF#refs/heads/}. Choose main under 'Use workflow from'."
+          exit 1
+
+      # Full history and tags: version.mjs reads the commits since the last tag.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check CI passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$sha&per_page=1" \
+            --jq '.workflow_runs[0] | if . == null then "none" else (.conclusion // .status) end')"
+          if [ "$conclusion" != "success" ]; then
+            echo "::error::CI on ${sha:0:7} is '$conclusion', not a pass. Wait for it to pass on main, then run this again."
+            exit 1
+          fi
+          echo "CI passed on ${sha:0:7}"
+
+      - name: Check the current version is published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          current="$(node scripts/version.mjs show)"
+          if ! git rev-parse --verify --quiet "refs/tags/v$current" > /dev/null; then
+            echo "::error::main is at $current, which has no v$current tag yet. Let Publish Extension finish releasing it before starting the next one."
+            exit 1
+          fi
+          open="$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open --json headRefName,url \
+            --jq '[.[] | select(.headRefName | startswith("release/"))][0].url // ""')"
+          if [ -n "$open" ]; then
+            echo "::error::A release pull request is already open: $open. Merge or close it first."
+            exit 1
+          fi
+
+      - name: Bump the version and date the changelog
+        id: bump
+        env:
+          LEVEL: ${{ inputs.level }}
+        run: |
+          echo "Unreleased commits call for: $(node scripts/version.mjs level)"
+          node scripts/version.mjs bump "$LEVEL"
+          version="$(node scripts/version.mjs show)"
+          node scripts/version.mjs check
+          {
+            echo "version=$version"
+            echo "tag=v$version"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Release notes from the changelog
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+          TAG: ${{ steps.bump.outputs.tag }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          node scripts/version.mjs notes "$VERSION" > "$RUNNER_TEMP/notes.md"
+          {
+            echo "Merging this releases **$TAG**. It sets the version in package.json, dates the"
+            echo "changelog, and updates the README's install example. Once CI passes on main,"
+            echo "Publish Extension publishes it to the VS Code Marketplace and Open VSX and"
+            echo "creates the GitHub release."
+            echo ''
+            echo 'Close it instead to cancel; nothing is published until it is merged.'
+            echo ''
+            echo '## Release notes'
+            echo ''
+            cat "$RUNNER_TEMP/notes.md"
+          } > "$RUNNER_TEMP/body.md"
+          {
+            if [ "$DRY_RUN" = true ]; then
+              echo "### $TAG (dry run, nothing pushed or opened)"
+            else
+              echo "### $TAG"
+            fi
+            echo ''
+            git diff --stat
+            echo ''
+            cat "$RUNNER_TEMP/notes.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push the release branch
+        if: ${{ !inputs.dry_run }}
+        env:
+          BRANCH: release/${{ steps.bump.outputs.tag }}
+          COMMIT: 'chore: release ${{ steps.bump.outputs.version }}'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$BRANCH"
+          git commit -am "$COMMIT"
+          git push origin "$BRANCH"
+
+      - name: Open the release pull request
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: release/${{ steps.bump.outputs.tag }}
+          TITLE: 'chore: release ${{ steps.bump.outputs.version }}'
+        run: |
+          if ! url="$(gh pr create --repo "$GITHUB_REPOSITORY" --base main \
+                --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md" 2>&1)"; then
+            echo "$url"
+            echo "::error::GitHub would not open the pull request. If it says Actions may not create pull requests, tick Settings, Actions, General, 'Allow GitHub Actions to create and approve pull requests', delete the $BRANCH branch, and run this again."
+            exit 1
+          fi
+          echo "Opened $url"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo "Release pull request: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      # A pull request opened with the built in token starts no workflow, so its
+      # checks would never run. Dispatching CI is the one start GitHub allows,
+      # and its result lands on the pull request's commit.
+      - name: Run CI on the release branch
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: release/${{ steps.bump.outputs.tag }}
+        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"

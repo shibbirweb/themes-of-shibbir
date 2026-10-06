@@ -1,0 +1,91 @@
+name: CI
+
+# Verifies the themes and the packaged extension on every pull request and every
+# push to main, so problems surface before a release is cut. Publishing itself
+# lives in publish.yml and only runs when a GitHub Release is published.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Same reason as publish.yml: no pnpm-lock.yaml is committed yet, and pnpm
+      # enables --frozen-lockfile by default whenever CI is set.
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Validate themes
+        run: node scripts/validate-themes.mjs
+
+      # package.json holds the version; the changelog needs a dated section for
+      # it and the README's install example has to name it.
+      - name: Check the version is consistent
+        run: node scripts/version.mjs check
+
+      # CLAUDE.md forbids the em-dash and en-dash in every file. git grep -I
+      # lists text files only, so binaries such as icon.png are skipped. The perl
+      # pattern uses codepoint escapes so this file does not match itself.
+      - name: Check for em-dashes and en-dashes
+        run: |
+          found="$(git grep -I -z --name-only -e '' | xargs -0 perl -CSD -ne 'print "$ARGV:$.\n" if /[\x{2014}\x{2013}]/; close ARGV if eof')"
+          if [ -n "$found" ]; then
+            echo "$found" | sed 's/^/::error::em-dash or en-dash at /'
+            exit 1
+          fi
+          echo "No em-dashes or en-dashes found."
+
+      - name: Package VSIX
+        run: pnpm exec vsce package --no-dependencies -o themes-of-shibbir.vsix
+
+      # Fails if the package gains a file outside the allowlist (a stray
+      # node_modules or tools folder, say) or loses a contributed theme.
+      - name: Verify package contents
+        run: |
+          pnpm exec vsce ls --no-dependencies > vsix-files.txt
+          cat vsix-files.txt
+          node -e '
+            const fs = require("fs");
+            const listed = fs.readFileSync("vsix-files.txt", "utf8").split("\n").map((line) => line.trim()).filter(Boolean);
+            const allowed = [/^package\.json$/, /^README\.md$/, /^CHANGELOG\.md$/, /^LICENSE$/, /^icon\.png$/, /^themes\/[^/]+\.json$/];
+            let failed = false;
+            for (const file of listed) {
+              if (!allowed.some((pattern) => pattern.test(file))) {
+                console.error(`::error::Unexpected file in the package: ${file}. Exclude it in .vscodeignore.`);
+                failed = true;
+              }
+            }
+            for (const entry of require("./package.json").contributes.themes) {
+              const file = entry.path.replace(/^\.\//, "");
+              if (!listed.includes(file)) {
+                console.error(`::error::Contributed theme ${file} is missing from the package.`);
+                failed = true;
+              }
+            }
+            process.exit(failed ? 1 : 0);
+          '
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: themes-of-shibbir-vsix
+          path: themes-of-shibbir.vsix
+          if-no-files-found: error

@@ -7,8 +7,10 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Work in progress on Dark Solid and Dark Shades: workbench chrome (activity bar, panel, status
-bar, tabs, terminal, git decorations) and the full set of TextMate token rules.
+## [0.1.0] - 2026-10-06
+
+Adds the Islands pair, the first complete themes in the extension and the first
+light theme. Dark Solid and Dark Shades are unchanged.
 
 ### Added
 
@@ -45,5 +47,6 @@ theme.
 - Published to both the Visual Studio Marketplace and Open VSX, so the themes
   install in VSCodium, Cursor, Gitpod, and other Open VSX editors.
 
-[Unreleased]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/shibbirweb/themes-of-shibbir/releases/tag/v0.0.1
