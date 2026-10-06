@@ -7,8 +7,20 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Work in progress on both themes: workbench chrome (activity bar, panel, status
+Work in progress on Dark Solid and Dark Shades: workbench chrome (activity bar, panel, status
 bar, tabs, terminal, git decorations) and the full set of TextMate token rules.
+
+### Added
+
+- **Themes of Shibbir: Islands Dark**, a dark theme with the editor and side
+  panes on near-black islands inside a lighter frame.
+- **Themes of Shibbir: Islands Light**, the same island layout in light colors.
+  This is the first light theme in the extension.
+- Both Islands themes are complete: every workbench color key in the VS Code
+  theme reference is set (editor, sidebar, panel, terminal and ANSI colors,
+  tabs, status bar, title bar, menus, widgets, lists, diff and merge editors,
+  notebooks, testing, debugging, source control, chat, and more), along with a
+  full set of TextMate token rules and semantic token colors.
 
 ## [0.0.1] - 2026-08-16
 

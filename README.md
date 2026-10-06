@@ -6,10 +6,11 @@
 [![Open VSX](https://img.shields.io/open-vsx/v/shibbirweb/themes-of-shibbir?label=Open%20VSX&color=1B222A)](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
 [![License](https://img.shields.io/badge/License-MIT-1B222A)](LICENSE)
 
-Two dark themes for Visual Studio Code, built around different ideas about depth.
+Four themes for Visual Studio Code: two dark themes built around different
+ideas about depth, plus the Islands pair, one dark and one light.
 
-They are not light and dark variants of one palette. Each has its own colors, so
-pick whichever suits how you like your editor to feel.
+Each has its own colors rather than being a variant of another, so pick
+whichever suits how you like your editor to feel.
 
 ## The themes
 
@@ -30,6 +31,27 @@ lightest editor background. Syntax colors are muted and desaturated to match.
 
 Pick this if you like being able to tell panes apart at a glance without reading
 them, and prefer a softer palette for long sessions.
+
+### Themes of Shibbir: Islands Dark
+
+The editor and sidebar sit on near-black islands inside a lighter frame, so
+each pane reads as its own surface. Syntax colors are warm and calm: orange
+keywords, green strings, cyan numbers, blue function declarations, and purple
+fields and constants.
+
+Pick this if you like clearly separated panes with a restrained palette.
+
+### Themes of Shibbir: Islands Light
+
+White islands on a soft gray frame. Syntax colors are crisp and dark: navy
+keywords, green strings, teal function declarations, and purple fields.
+
+Pick this for the same island layout in a light editor.
+
+Both Islands themes style the whole window, not just the editor: sidebar,
+panel, terminal (including ANSI colors), tabs, status bar, menus, widgets,
+diff and merge editors, notebooks, source control, and chat. In the diff
+editor, deleted lines show gray rather than red, and changed lines blue.
 
 ## Where it is published
 
@@ -65,10 +87,10 @@ codium --install-extension themes-of-shibbir-0.0.1.vsix
 ## Activate
 
 Open the Color Theme picker with `Cmd+K Cmd+T` on macOS or `Ctrl+K Ctrl+T` on
-Windows and Linux, then choose **Themes of Shibbir: Dark Solid** or
-**Themes of Shibbir: Dark Shades**.
+Windows and Linux, then choose any **Themes of Shibbir** entry: Dark Solid, Dark Shades,
+Islands Dark, or Islands Light.
 
-Both entries share a prefix, so they appear next to each other in the list.
+All entries share a prefix, so they appear next to each other in the list.
 
 To set one as your default without opening the picker, add this to your
 `settings.json`:
@@ -90,9 +112,10 @@ semantic token provider.
 
 ## Status
 
-These themes are actively being built out, one area at a time. If some part of
-the editor still looks like the stock dark theme, that area has not been styled
-yet rather than being deliberately left alone.
+The Islands themes are complete. Dark Solid and Dark Shades are actively being
+built out, one area at a time. If some part of the editor still looks like the
+stock VS Code theme in one of those two, that area has not been styled yet
+rather than being deliberately left alone.
 
 Suggestions for what to cover next are welcome.
 
