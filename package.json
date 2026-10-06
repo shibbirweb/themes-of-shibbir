@@ -2,7 +2,7 @@
   "name": "themes-of-shibbir",
   "displayName": "Themes of Shibbir",
   "description": "Themes of Md. Shibbir Ahmed",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "shibbirweb",
   "icon": "icon.png",
   "packageManager": "pnpm@11.9.0",
@@ -61,6 +61,7 @@
     ]
   },
   "scripts": {
+    "validate": "node scripts/validate-themes.mjs && node scripts/version.mjs check",
     "package": "vsce package --no-dependencies",
     "publish": "vsce publish --no-dependencies",
     "publish:ovsx": "ovsx publish --no-dependencies"

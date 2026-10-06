@@ -81,7 +81,7 @@ view, or download the `.vsix` from the
 and run:
 
 ```sh
-codium --install-extension themes-of-shibbir-0.0.1.vsix
+codium --install-extension themes-of-shibbir-0.1.0.vsix
 ```
 
 ## Activate

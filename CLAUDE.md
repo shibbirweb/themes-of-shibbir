@@ -24,18 +24,36 @@ Verify before handing work back:
 # Must return nothing. Uses perl codepoint escapes so the command does
 # not itself contain the characters it searches for, which would make it
 # match its own source. macOS grep has no -P, so grep cannot do this.
-git ls-files -z | xargs -0 perl -CSD -ne 'print "$ARGV:$.\n" if /[\x{2014}\x{2013}]/'
+# git grep -I lists text files only, so icon.png is skipped, and --untracked
+# includes new files not yet added. CI runs the same check.
+git grep -I -z --name-only --untracked -e '' | xargs -0 perl -CSD -ne 'print "$ARGV:$.\n" if /[\x{2014}\x{2013}]/; close ARGV if eof'
 ```
 
 ## Commands
 
-There are no npm scripts and no `node_modules`. Everything is either an editor action or a one-off `npx`.
+There is no build step. The only dependencies are the packaging tools (`@vscode/vsce`, `ovsx`); `pnpm install` fetches them. `vsce` 3 needs Node 20 or newer.
 
 - **Dev loop:** press `F5` to launch an Extension Development Host (the `Extension` config in `.vscode/launch.json`, `type: extensionHost`). Edits to the theme JSON apply live in that window; no reload needed.
 - **Activate a theme** in the host window: `Cmd+K Cmd+T`, then any "Themes of Shibbir: ..." entry. Switch between them in that same picker to compare.
 - **Find the right scope before adding a token rule:** Command Palette → `Developer: Inspect Editor Tokens and Scopes`.
-- **Package a `.vsix`:** `npx @vscode/vsce package` (vsce is not a devDependency). The `.vsix` is gitignored.
+- **Validate the themes:** `pnpm validate` (runs `scripts/validate-themes.mjs`, then `scripts/version.mjs check`). It checks that every contributed theme parses, that `name` matches its label and `type` matches `uiTheme`, that every color is valid hex and every `fontStyle` is valid, and that each sibling pair in its `PAIRS` list is structurally parallel. Add a new theme pair to `PAIRS`. The version check confirms the changelog has a dated section for the `package.json` version and the README's install example names it.
+- **Package a `.vsix`:** `pnpm package`. The `.vsix` is gitignored. Anything dev-only that should stay out of it goes in `.vscodeignore`.
+- **CI:** `.github/workflows/ci.yml` runs on every pull request and every push to `main`: it validates the themes and the version, runs the dash check below, packages the `.vsix`, fails if the package holds anything besides `package.json`, `README.md`, `CHANGELOG.md`, `LICENSE`, `icon.png`, and `themes/*.json`, and uploads the `.vsix` as a build artifact. `publish.yml` runs the same checks before publishing.
 - **Install locally without packaging:** copy the folder into `~/.vscode/extensions` and restart VS Code.
+
+## Releasing
+
+Never edit the version by hand. Releases go through two workflows:
+
+1. **Record changes as they land.** Every pull request that changes what people install adds a line under `## [Unreleased]` in `CHANGELOG.md`, in the Keep a Changelog subsections (`### Added`, `### Changed`, `### Fixed`). Only release notes go there: the release workflow moves that whole section into the release, word for word, and refuses to run while it is empty.
+2. **Start the release:** Actions, "Release", Run workflow, on `main`. Pick a level: `auto` reads the conventional commits since the last tag (any `feat` is minor; otherwise `fix`, `perf`, `refactor` or `style` is patch; a `!` after the type is major; docs, chore, ci and test alone call for none, so `auto` refuses). Tick "dry run" to preview. It runs `node scripts/version.mjs bump`, which sets `package.json`, dates the changelog section and its compare links, and updates the README's `.vsix` example. Then it opens a `chore: release x.y.z` pull request from `release/vx.y.z` with the notes in its description, and dispatches CI on it.
+3. **Merge that pull request.** That is the decision to release. When CI passes on `main`, `publish.yml` sees a version with no tag, publishes to the VS Code Marketplace and Open VSX, and then creates the `vx.y.z` tag and GitHub release with the changelog section as notes and the `.vsix` attached.
+
+The release workflow refuses to start unless CI passed on `main`'s tip, the current version is already tagged, and no other release pull request is open. It needs the repository setting Settings, Actions, General, "Allow GitHub Actions to create and approve pull requests". Publishing needs the `VSCE_PAT` secret; `OVSX_PAT` is optional and skips Open VSX when unset.
+
+If a publish fails, use "Re-run failed jobs" on it, or run Publish Extension by hand from `main`. The tag is created last and both marketplace publishes skip a version they already have, so retrying is safe.
+
+To inspect locally: `node scripts/version.mjs show`, `level` (what `auto` would pick), and `notes [x.y.z]`.
 
 ## The themes
 

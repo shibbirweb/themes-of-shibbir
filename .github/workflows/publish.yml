@@ -1,29 +1,89 @@
 name: Publish Extension
 
-# Publishes to the VS Code Marketplace and Open VSX whenever a GitHub Release is
-# published. Create the release from the main branch after bumping the version in
-# package.json to match the release tag.
+# Publishes a release once it reaches main and CI has passed there.
+#
+# The last step of release.yml: merging its release pull request moves main to a
+# new version. This runs whenever CI finishes on a push to main and acts only
+# when CI passed and main is at a version with no tag yet; every other run ends
+# with a note. It publishes to the VS Code Marketplace and Open VSX from the
+# commit CI passed on, then creates the GitHub release and tag with the version's
+# changelog section as notes and the .vsix attached.
+#
+# The GitHub release comes last on purpose: if a marketplace publish fails, no
+# tag exists yet, so "Re-run failed jobs" retries the whole publish. Both
+# publishes skip a version the marketplace already has, so a retry after a
+# partial success is safe. Run it by hand from main (Actions, Publish Extension,
+# Run workflow) to retry outside a CI run.
 #
 # Required repository secrets:
 #   VSCE_PAT  Azure DevOps token with Marketplace > Manage scope.
 #   OVSX_PAT  Open VSX token. Both Open VSX steps are skipped when it is unset.
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write # upload the .vsix as a release asset
+  contents: write # create the release and upload the .vsix
+
+# The same version must not be published twice by two CI runs finishing close together.
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
 jobs:
+  check:
+    name: Is there a release to publish?
+    runs-on: ubuntu-latest
+    # Only CI that passed on a push to main, or a manual run on main. A pull
+    # request's CI never publishes anything.
+    if: >-
+      (github.event_name == 'workflow_run'
+        && github.event.workflow_run.conclusion == 'success'
+        && github.event.workflow_run.event == 'push')
+      || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+      sha: ${{ steps.check.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compare the version with the tags
+        id: check
+        run: |
+          version="$(node scripts/version.mjs show)"
+          if git rev-parse --verify --quiet "refs/tags/v$version" > /dev/null; then
+            echo "v$version is already released. Nothing to do." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "main is at $version with no tag yet: publishing v$version." >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "tag=v$version"
+            echo "sha=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
   publish:
+    name: Publish ${{ needs.check.outputs.tag }}
+    needs: check
+    if: needs.check.outputs.tag != ''
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ github.event.release.tag_name }}
+      TAG: ${{ needs.check.outputs.tag }}
+      SHA: ${{ needs.check.outputs.sha }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # needed to prove the release commit is on main
+          ref: ${{ needs.check.outputs.sha }}
 
       - uses: pnpm/action-setup@v4
 
@@ -38,59 +98,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Verify the release was cut from main
+      # CI already ran these on this commit; they are cheap, and a manual run has
+      # no CI result behind it.
+      - name: Validate themes and version
         run: |
-          # Compare against FETCH_HEAD, not origin/main. A release event checks
-          # out a tag, so the remote-tracking ref refs/remotes/origin/main is not
-          # guaranteed to exist and "origin/main" can fail to resolve. FETCH_HEAD
-          # is always written by the fetch on the line above.
-          git fetch --no-tags origin main
-          if git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD; then
-            echo "Release commit $GITHUB_SHA is on main."
-          else
-            echo "::error::Release commit $GITHUB_SHA is not on main. Publish releases from main only."
-            exit 1
-          fi
-
-      - name: Verify version matches release tag
-        run: |
-          PKG_VERSION="$(node -p "require('./package.json').version")"
-          TAG_VERSION="${TAG#v}"
-          echo "package.json=$PKG_VERSION  release=$TAG_VERSION"
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::package.json version ($PKG_VERSION) does not match release tag ($TAG_VERSION). Bump the version before releasing."
-            exit 1
-          fi
-
-      # This repo has no source to lint, so the equivalent guard is checking that
-      # every contributed theme resolves to a file that parses.
-      - name: Validate contributed themes
-        run: |
-          node -e '
-            const fs = require("fs");
-            const themes = (require("./package.json").contributes || {}).themes || [];
-            if (themes.length === 0) {
-              console.error("::error::package.json contributes no themes.");
-              process.exit(1);
-            }
-            let failed = false;
-            for (const entry of themes) {
-              const file = entry.path.replace(/^\.\//, "");
-              if (!fs.existsSync(file)) {
-                console.error(`::error::Missing theme file ${file} for label "${entry.label}".`);
-                failed = true;
-                continue;
-              }
-              try {
-                const theme = JSON.parse(fs.readFileSync(file, "utf8"));
-                console.log(`OK ${entry.label} -> ${file} (${Object.keys(theme.colors || {}).length} colors, ${(theme.tokenColors || []).length} token rules)`);
-              } catch (error) {
-                console.error(`::error::${file} is not valid JSON: ${error.message}`);
-                failed = true;
-              }
-            }
-            process.exit(failed ? 1 : 0);
-          '
+          node scripts/validate-themes.mjs
+          node scripts/version.mjs check
 
       - name: Package VSIX
         run: pnpm exec vsce package --no-dependencies -o "themes-of-shibbir-${TAG}.vsix"
@@ -103,7 +116,7 @@ jobs:
             echo "::error::Repository secret VSCE_PAT is not set. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
-          pnpm exec vsce publish --no-dependencies --packagePath "themes-of-shibbir-${TAG}.vsix"
+          pnpm exec vsce publish --no-dependencies --skip-duplicate --packagePath "themes-of-shibbir-${TAG}.vsix"
 
       - name: Ensure Open VSX namespace
         if: ${{ env.OVSX_PAT != '' }}
@@ -113,9 +126,17 @@ jobs:
 
       - name: Publish to Open VSX
         if: ${{ env.OVSX_PAT != '' }}
-        run: pnpm exec ovsx publish "themes-of-shibbir-${TAG}.vsix" -p "$OVSX_PAT"
+        run: pnpm exec ovsx publish "themes-of-shibbir-${TAG}.vsix" --skip-duplicate -p "$OVSX_PAT"
 
-      - name: Attach VSIX to the release
+      - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$TAG" "themes-of-shibbir-${TAG}.vsix" --clobber
+        run: |
+          node scripts/version.mjs notes "${TAG#v}" > "$RUNNER_TEMP/notes.md"
+          gh release create "$TAG" "themes-of-shibbir-${TAG}.vsix" --repo "$GITHUB_REPOSITORY" \
+            --target "$SHA" --latest --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md"
+          {
+            echo "### Published $TAG"
+            echo ''
+            cat "$RUNNER_TEMP/notes.md"
+          } >> "$GITHUB_STEP_SUMMARY"
