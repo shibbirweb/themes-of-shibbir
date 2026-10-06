@@ -1,8 +1,8 @@
 name: CI
 
 # Verifies the themes and the packaged extension on every pull request and every
-# push to main, so problems surface before a release is cut. Publishing itself
-# lives in publish.yml and only runs when a GitHub Release is published.
+# push to main, so problems surface before a release is cut. The downloadable
+# .vsix for a pull request comes from vsix.yml; publishing lives in publish.yml.
 on:
   pull_request:
   push:
@@ -84,10 +84,3 @@ jobs:
             }
             process.exit(failed ? 1 : 0);
           '
-
-      - name: Upload VSIX
-        uses: actions/upload-artifact@v4
-        with:
-          name: themes-of-shibbir-vsix
-          path: themes-of-shibbir.vsix
-          if-no-files-found: error

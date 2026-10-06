@@ -38,7 +38,8 @@ There is no build step. The only dependencies are the packaging tools (`@vscode/
 - **Find the right scope before adding a token rule:** Command Palette → `Developer: Inspect Editor Tokens and Scopes`.
 - **Validate the themes:** `pnpm validate` (runs `scripts/validate-themes.mjs`, then `scripts/version.mjs check`). It checks that every contributed theme parses, that `name` matches its label and `type` matches `uiTheme`, that every color is valid hex and every `fontStyle` is valid, and that each sibling pair in its `PAIRS` list is structurally parallel. Add a new theme pair to `PAIRS`. The version check confirms the changelog has a dated section for the `package.json` version and the README's install example names it.
 - **Package a `.vsix`:** `pnpm package`. The `.vsix` is gitignored. Anything dev-only that should stay out of it goes in `.vscodeignore`.
-- **CI:** `.github/workflows/ci.yml` runs on every pull request and every push to `main`: it validates the themes and the version, runs the dash check below, packages the `.vsix`, fails if the package holds anything besides `package.json`, `README.md`, `CHANGELOG.md`, `LICENSE`, `icon.png`, and `themes/*.json`, and uploads the `.vsix` as a build artifact. `publish.yml` runs the same checks before publishing.
+- **CI:** `.github/workflows/ci.yml` runs on every pull request and every push to `main`: it validates the themes and the version, runs the dash check below, packages the `.vsix`, fails if the package holds anything besides `package.json`, `README.md`, `CHANGELOG.md`, `LICENSE`, `icon.png`, and `themes/*.json`. `publish.yml` runs the same checks before publishing.
+- **Try a pull request's build:** `.github/workflows/vsix.yml` ("VSIX package") runs on every pull request, apart from CI so it can never hold up a release. It builds `themes-of-shibbir-<version>-<sha>.vsix`, installs it into a freshly downloaded VS Code with a throwaway profile, fails unless VS Code lists the extension at that version and every contributed theme landed byte for byte, and keeps the `.vsix` for 14 days as the run's `themes-of-shibbir-vsix` artifact. Download it from the pull request's checks, unzip it, and use "Extensions: Install from VSIX...". Run it by hand from the Actions tab for any branch.
 - **Install locally without packaging:** copy the folder into `~/.vscode/extensions` and restart VS Code.
 
 ## Releasing
@@ -70,9 +71,9 @@ Islands Dark and Islands Light are **two separate palettes** for the same layout
 
 Each file has four parts: `colors` for workbench chrome, `tokenColors` for TextMate scope rules, `semanticTokenColors` for language-server tokens, and `"type"` plus `"semanticHighlighting": true` at the top.
 
-### Why the engine floor is 1.12, and why it stays there
 Version 0.1.0 removed two earlier skeleton themes, Dark Solid and Dark Shades. Do not reintroduce their files or palettes.
 
+### Why the engine floor is 1.12, and why it stays there
 
 `engines.vscode` is `^1.12.0`: the release that introduced workbench `colors`, and therefore the oldest VS Code on which both halves of these files do something. The range has no upper bound, so current and future releases are covered without ever bumping it.
 
