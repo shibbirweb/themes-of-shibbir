@@ -71,7 +71,7 @@ Islands Dark and Islands Light are **two separate palettes** for the same layout
 
 Each file has four parts: `colors` for workbench chrome, `tokenColors` for TextMate scope rules, `semanticTokenColors` for language-server tokens, and `"type"` plus `"semanticHighlighting": true` at the top.
 
-Version 0.1.0 removed two earlier skeleton themes, Dark Solid and Dark Shades. Do not reintroduce their files or palettes.
+Releases up to 0.1.0 also shipped two skeleton themes, Dark Solid and Dark Shades; they were removed after 0.1.0. Do not reintroduce their files or palettes.
 
 ### Why the engine floor is 1.12, and why it stays there
 
