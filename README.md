@@ -99,11 +99,11 @@ builds it is ignored and syntax coloring falls back to TextMate rules, so the
 themes still work, just with less precise coloring in languages that ship a
 semantic token provider.
 
-## Upgrading from 0.0.1
+## Upgrading from an earlier version
 
-Version 0.1.0 removed the early Dark Solid and Dark Shades themes. If you had
-one of them selected, VS Code falls back to its default theme after the update;
-pick Islands Dark or Islands Light from the Color Theme picker to switch.
+The early Dark Solid and Dark Shades themes have been removed. If you had one of
+them selected, VS Code falls back to its default theme after the update; pick
+Islands Dark or Islands Light from the Color Theme picker to switch.
 
 ## Feedback
 
