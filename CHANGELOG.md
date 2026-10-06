@@ -7,6 +7,8 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-06
+
 ### Removed
 
 - **Themes of Shibbir: Dark Solid** and **Themes of Shibbir: Dark Shades**, the
@@ -60,6 +62,7 @@ theme.
 - Published to both the Visual Studio Marketplace and Open VSX, so the themes
   install in VSCodium, Cursor, Gitpod, and other Open VSX editors.
 
-[Unreleased]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/shibbirweb/themes-of-shibbir/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/shibbirweb/themes-of-shibbir/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/shibbirweb/themes-of-shibbir/releases/tag/v0.0.1
