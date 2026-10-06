@@ -39,16 +39,6 @@
   "contributes": {
     "themes": [
       {
-        "label": "Themes of Shibbir: Dark Solid",
-        "uiTheme": "vs-dark",
-        "path": "./themes/dark-solid-color-theme.json"
-      },
-      {
-        "label": "Themes of Shibbir: Dark Shades",
-        "uiTheme": "vs-dark",
-        "path": "./themes/dark-shades-color-theme.json"
-      },
-      {
         "label": "Themes of Shibbir: Islands Dark",
         "uiTheme": "vs-dark",
         "path": "./themes/islands-dark-color-theme.json"

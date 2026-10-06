@@ -8,35 +8,14 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/shibbirweb/themes-of-shibbir/ci.yml?branch=main&label=CI&labelColor=191A1C&color=3871E1)](https://github.com/shibbirweb/themes-of-shibbir/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3871E1?labelColor=191A1C)](LICENSE)
 
-Four themes for Visual Studio Code: two dark themes built around different
-ideas about depth, plus the Islands pair, one dark and one light.
+Two themes for Visual Studio Code, Islands Dark and Islands Light. Both set the
+editor and side panes on separate island surfaces inside a frame, so every part
+of the window reads as its own space.
 
-Each has its own colors rather than being a variant of another, so pick
-whichever suits how you like your editor to feel.
+They are two palettes built for the same layout rather than one palette
+inverted, so each is tuned for its own background.
 
 ## The themes
-
-### Themes of Shibbir: Dark Solid
-
-One flat surface color across the whole window. The editor, sidebar, panel,
-status bar, and tabs all sit at the same depth, separated only by thin borders.
-Syntax colors are vivid and saturated, so the code is the only thing with
-contrast on screen.
-
-Pick this if you find layered chrome noisy and want your attention pulled
-entirely to the text.
-
-![Themes of Shibbir: Islands Dark, showing the explorer, a React component, and the integrated terminal](images/islands-dark.png)
-
-### Themes of Shibbir: Dark Shades
-
-Surfaces step through five distinct depths, from the darkest status bar up to the
-lightest editor background. Syntax colors are muted and desaturated to match.
-
-Pick this if you like being able to tell panes apart at a glance without reading
-them, and prefer a softer palette for long sessions.
-![Themes of Shibbir: Islands Light, showing the explorer, a React component, and the integrated terminal](images/islands-light.png)
-
 
 ### Themes of Shibbir: Islands Dark
 
@@ -47,12 +26,16 @@ fields and constants.
 
 Pick this if you like clearly separated panes with a restrained palette.
 
+![Themes of Shibbir: Islands Dark, showing the explorer, a React component, and the integrated terminal](images/islands-dark.png)
+
 ### Themes of Shibbir: Islands Light
 
 White islands on a soft gray frame. Syntax colors are crisp and dark: navy
 keywords, green strings, teal function declarations, and purple fields.
 
 Pick this for the same island layout in a light editor.
+
+![Themes of Shibbir: Islands Light, showing the explorer, a React component, and the integrated terminal](images/islands-light.png)
 
 Both Islands themes style the whole window, not just the editor: sidebar,
 panel, terminal (including ANSI colors), tabs, status bar, menus, widgets,
@@ -93,17 +76,17 @@ codium --install-extension themes-of-shibbir-0.1.0.vsix
 ## Activate
 
 Open the Color Theme picker with `Cmd+K Cmd+T` on macOS or `Ctrl+K Ctrl+T` on
-Windows and Linux, then choose any **Themes of Shibbir** entry: Dark Solid, Dark Shades,
-Islands Dark, or Islands Light.
+Windows and Linux, then choose **Themes of Shibbir: Islands Dark** or
+**Themes of Shibbir: Islands Light**.
 
-All entries share a prefix, so they appear next to each other in the list.
+Both entries share a prefix, so they appear next to each other in the list.
 
 To set one as your default without opening the picker, add this to your
 `settings.json`:
 
 ```json
 {
-  "workbench.colorTheme": "Themes of Shibbir: Dark Solid"
+  "workbench.colorTheme": "Themes of Shibbir: Islands Dark"
 }
 ```
 
@@ -116,14 +99,11 @@ builds it is ignored and syntax coloring falls back to TextMate rules, so the
 themes still work, just with less precise coloring in languages that ship a
 semantic token provider.
 
-## Status
+## Upgrading from 0.0.1
 
-The Islands themes are complete. Dark Solid and Dark Shades are actively being
-built out, one area at a time. If some part of the editor still looks like the
-stock VS Code theme in one of those two, that area has not been styled yet
-rather than being deliberately left alone.
-
-Suggestions for what to cover next are welcome.
+Version 0.1.0 removed the early Dark Solid and Dark Shades themes. If you had
+one of them selected, VS Code falls back to its default theme after the update;
+pick Islands Dark or Islands Light from the Color Theme picker to switch.
 
 ## Feedback
 

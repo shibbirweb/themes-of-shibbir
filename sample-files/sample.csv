@@ -1,35 +1,61 @@
-rule,scope,dark_solid_hex,dark_shades_hex,font_style,notes
-Comment,comment,#5C6773,#556070,italic,"Also punctuation.definition.comment"
-Variable,variable,#E06C75,#C08A8F,normal,
-"Variable, other",variable.other.object,#D9E0E8,#C3CBD5,normal,"Object keys and readwrite vars"
-Language variable,variable.language,#C678DD,#A98CC8,italic,"this, self, $this"
-"Keyword, storage",keyword,#C678DD,#A98CC8,normal,"Also storage.type and storage.modifier"
-"Operator, punctuation",keyword.operator,#56B6C2,#6FA3A8,normal,"Separators, terminators, braces"
-Function,entity.name.function,#61AFEF,#7BA7CC,normal,"Also support.function and calls"
-Function parameter,variable.parameter,#D19A66,#C39B72,normal,
-"Class, type, support",entity.name.type,#E5C07B,#C9B285,normal,"Also inherited classes"
-String,string,#98C379,#8FB98A,normal,"Includes symbols and keys"
-Escape character,constant.character.escape,#56B6C2,#6FA3A8,normal,"Shared with string.regexp"
-"Number, constant",constant.numeric,#D19A66,#C39B72,normal,"Also constant.language and units"
-Invalid,invalid,#FF5370,#C96A6A,normal,"Also invalid.illegal"
-Deprecated,invalid.deprecated,#D19A66,#C39B72,strikethrough,"Only strikethrough rule in either theme"
-Tag,entity.name.tag,#E06C75,#C08A8F,normal,
-Tag punctuation,punctuation.definition.tag,#5C6773,#556070,normal,"Deliberately dimmer than the tag name"
-Attribute name,entity.other.attribute-name,#D19A66,#C39B72,normal,
-CSS property name,source.css support.type.property-name,#61AFEF,#7BA7CC,normal,"Covers css, sass, scss, less, stylus, postcss"
-CSS class and id,entity.other.attribute-name.class,#E5C07B,#C9B285,normal,
-PHP namespace,support.other.namespace.use.php,#E5C07B,#C9B285,normal,"Includes the inheritance separator"
-Decorator,meta.decorator,#61AFEF,#7BA7CC,italic,
-"JSON key, level 0",source.json support.type.property-name.json,#61AFEF,#7BA7CC,normal,"Top level keys"
-"JSON key, level 1",source.json support.type.property-name.json,#C678DD,#A98CC8,normal,"One level of nesting"
-"JSON key, level 2+",source.json support.type.property-name.json,#E5C07B,#C9B285,normal,"Ancestor match, so levels 3 to 8 land here too"
-Markdown heading,markup.heading,#61AFEF,#7BA7CC,bold,
-Markdown bold,markup.bold,#D19A66,#C39B72,bold,
-Markdown italic,markup.italic,#C678DD,#A98CC8,italic,
-Markdown link,markup.underline.link,#56B6C2,#6FA3A8,underline,
-Markdown quote,markup.quote,#5C6773,#556070,italic,
-Markdown raw and fenced code,markup.inline.raw,#98C379,#8FB98A,normal,
-Markdown list punctuation,punctuation.definition.list.begin.markdown,#5C6773,#556070,normal,"Also meta.separator"
-Diff inserted,markup.inserted,#98C379,#8FB98A,normal,"See sample.diff"
-Diff deleted,markup.deleted,#E06C75,#C08A8F,normal,"See sample.diff"
-Diff changed,markup.changed,#E5C07B,#C9B285,normal,"See sample.diff"
+rule,scope,islands_dark_hex,islands_light_hex,font_style_dark,font_style_light,notes
+Comment,comment,#7A7E85,#8C8C8C,normal,italic,Plus 1 more scope
+Doc comment,comment.block.documentation,#5F826B,#8C8C8C,italic,italic,Plus 5 more scopes
+Doc comment tag,comment.block.documentation storage.type,#67A37C,#8C8C8C,normal,underline,Plus 6 more scopes
+Doc comment tag value,comment.block.documentation variable,#ABADB3,#3D3D3D,normal,italic,Plus 4 more scopes
+Keyword,keyword,#CF8E6D,#0033B3,normal,normal,Plus 11 more scopes
+Operator and punctuation,keyword.operator,#BCBEC4,#080808,normal,normal,Plus 3 more scopes
+Word operator,keyword.operator.new,#CF8E6D,#0033B3,normal,normal,Plus 14 more scopes
+String,string,#6AAB73,#067D17,normal,normal,Plus 5 more scopes
+String escape,constant.character.escape,#CF8E6D,#0037A6,normal,normal,Plus 8 more scopes
+Embedded code delimiters,punctuation.definition.template-expression,#CF8E6D,#0033B3,normal,normal,Plus 7 more scopes
+Number,constant.numeric,#2AACB8,#1750EB,normal,normal,Plus 3 more scopes
+Constant,variable.other.constant,#C77DBB,#871094,italic,italic,Plus 15 more scopes
+Variable,variable,#BCBEC4,#080808,normal,normal,Plus 7 more scopes
+Property,variable.other.property,#C77DBB,#871094,normal,normal,Plus 9 more scopes
+Static property,variable.other.property.static,#C77DBB,#871094,italic,italic,Plus 2 more scopes
+Function,entity.name.function,#56A8F5,#00627A,normal,normal,Plus 8 more scopes
+Static method,entity.name.function.static,#56A8F5,#00627A,italic,italic,Plus 1 more scope
+Class and type,entity.name.type,#BCBEC4,#080808,normal,normal,Plus 17 more scopes
+Type parameter,entity.name.type.parameter,#16BAAC,#007E8A,normal,normal,Plus 4 more scopes
+Annotation and decorator,meta.decorator,#B3AE60,#9E880D,normal,normal,Plus 15 more scopes
+Markup tag,entity.name.tag,#D5B778,#0033B3,normal,normal,Plus 2 more scopes
+Markup tag punctuation,punctuation.definition.tag,#D5B778,#080808,normal,normal,Plus 1 more scope
+Markup custom tag,support.class.component,#2FBAA3,#008077,normal,normal,Plus 2 more scopes
+Markup attribute,entity.other.attribute-name,#BCBEC4,#174AD4,normal,normal,Plus 1 more scope
+Markup entity,constant.character.entity,#56A8F5,#174BE6,normal,normal,Plus 1 more scope
+XML prologue,meta.tag.preprocessor.xml,#D5B778,#080808,normal,normal,Plus 2 more scopes
+XML namespace,entity.name.tag.namespace,#C77DBB,#871094,normal,normal,Plus 1 more scope
+CSS property name,support.type.property-name.css,#C77DBB,#871094,normal,normal,Plus 7 more scopes
+CSS selector,entity.name.tag.css,#CF8E6D,#0033B3,normal,normal,Plus 6 more scopes
+CSS class and id,entity.other.attribute-name.class,#BCBEC4,#080808,normal,normal,Plus 4 more scopes
+CSS value,support.constant.property-value,#BCBEC4,#080808,normal,normal,Plus 4 more scopes
+CSS color,constant.other.color,#56A8F5,#1750EB,normal,normal,Plus 2 more scopes
+CSS url,variable.parameter.url,#5C92FF,#006DCC,normal,normal,Plus 2 more scopes
+CSS important,keyword.other.important,#CF8E6D,#0033B3,bold,normal,
+CSS at-rule,keyword.control.at-rule,#CF8E6D,#0033B3,normal,normal,Plus 2 more scopes
+JSON key,support.type.property-name.json,#C77DBB,#871094,normal,normal,Plus 4 more scopes
+YAML and config key,entity.name.tag.yaml,#CF8E6D,#0033B3,normal,normal,Plus 10 more scopes
+Properties key,support.type.property-name.properties,#CF8E6D,#083080,normal,normal,Plus 2 more scopes
+YAML anchor,entity.name.type.anchor.yaml,#B3AE60,#9E880D,normal,normal,Plus 3 more scopes
+Regular expression,string.regexp,#42C3D4,#264EFF,normal,normal,Plus 1 more scope
+Regular expression class,constant.other.character-class.regexp,#B2AE60,#9E880D,bold,normal,Plus 2 more scopes
+Regular expression operator,keyword.operator.quantifier.regexp,#CF8E6D,#0033B3,normal,normal,Plus 4 more scopes
+Regular expression escape,constant.character.escape.regexp,#CF8E6D,#0037A6,normal,normal,Plus 1 more scope
+Markdown heading,markup.heading,#C77DBB,#871094,italic,italic,Plus 3 more scopes
+Markdown marker,punctuation.definition.heading.markdown,#CF8E6D,#0033B3,normal,normal,Plus 11 more scopes
+Markdown bold,markup.bold,,,bold,bold,
+Markdown italic,markup.italic,,,italic,italic,
+Markdown strikethrough,markup.strikethrough,,,strikethrough,strikethrough,
+Markdown code,markup.inline.raw,#BCBEC4,#067D17,normal,normal,Plus 3 more scopes
+Markdown code language,fenced_code.block.language,#C77DBB,#871094,italic,italic,Plus 1 more scope
+Markdown quote,markup.quote,#BCBEC4,#067D17,normal,normal,
+Markdown link text,string.other.link.title.markdown,#56A8F5,#006DCC,normal,normal,Plus 2 more scopes
+Markdown link url,markup.underline.link,#548AF7,#006DCC,normal,normal,Plus 3 more scopes
+Diff inserted,markup.inserted,#73BD79,#067D17,normal,normal,Plus 1 more scope
+Diff deleted,markup.deleted,#F57E84,#C54E58,normal,normal,Plus 1 more scope
+Diff changed,markup.changed,#70AEFF,#0033B3,normal,normal,Plus 1 more scope
+Diff header,meta.diff.range,#B3AE60,#9E880D,normal,normal,Plus 6 more scopes
+Link,markup.underline.link,#548AF7,#006DCC,normal,normal,Plus 1 more scope
+Invalid,invalid,#F75464,#F50000,normal,normal,Plus 1 more scope
+Deprecated,invalid.deprecated,,,strikethrough,strikethrough,

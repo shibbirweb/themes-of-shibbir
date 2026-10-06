@@ -9,8 +9,8 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] - 2026-10-06
 
-Adds the Islands pair, the first complete themes in the extension and the first
-light theme. Dark Solid and Dark Shades are unchanged.
+Replaces the early Dark Solid and Dark Shades themes with the Islands pair, the
+first complete themes in the extension and the first light theme.
 
 ### Added
 
@@ -23,6 +23,12 @@ light theme. Dark Solid and Dark Shades are unchanged.
   tabs, status bar, title bar, menus, widgets, lists, diff and merge editors,
   notebooks, testing, debugging, source control, chat, and more), along with a
   full set of TextMate token rules and semantic token colors.
+
+### Removed
+
+- **Themes of Shibbir: Dark Solid** and **Themes of Shibbir: Dark Shades**. If
+  either was your color theme, VS Code falls back to its default after this
+  update; choose Islands Dark or Islands Light instead.
 
 ## [0.0.1] - 2026-08-16
 
