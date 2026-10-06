@@ -16,7 +16,6 @@ const LABEL_PREFIX = 'Themes of Shibbir: ';
 
 // Sibling themes that must keep the same keys, rules, and order.
 const PAIRS = [
-	['themes/dark-solid-color-theme.json', 'themes/dark-shades-color-theme.json'],
 	['themes/islands-dark-color-theme.json', 'themes/islands-light-color-theme.json'],
 ];
 
@@ -164,7 +163,7 @@ if (errors.length > 0) {
 	process.exit(1);
 }
 
-console.log(`All ${themes.length} themes and ${PAIRS.length} pairs are valid.`);
+console.log(`All ${themes.length} themes and ${PAIRS.length} sibling pair${PAIRS.length === 1 ? '' : 's'} are valid.`);
 
 function loadContributedThemes() {
 	const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));

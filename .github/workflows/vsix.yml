@@ -1,0 +1,121 @@
+# Builds the .vsix for every pull request, installs it into a real VS Code on the
+# runner to check what it carries, and keeps it as a download (the run's
+# Artifacts) for trying a change locally before it is released.
+#
+# To try it: open the run from the pull request's checks, download
+# "themes-of-shibbir-vsix" under Artifacts, unzip it, then in VS Code run
+# "Extensions: Install from VSIX..." and pick the .vsix inside.
+#
+# Apart from ci.yml on purpose, the way git-merger keeps its app builds apart:
+# the release workflows wait for CI, so nothing here can hold up a release.
+# publish.yml builds the real package the same way.
+name: VSIX package
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same pull request makes the older package useless.
+concurrency:
+  group: vsix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vsix:
+    name: Build, install and keep the VSIX
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Same reason as ci.yml: no pnpm-lock.yaml is committed yet, and pnpm
+      # enables --frozen-lockfile by default whenever CI is set.
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # The version and commit in the file name tell two downloads apart once
+      # they leave the run page.
+      # On a pull request the checkout is GitHub's merge commit, so name the file
+      # after the pull request's own head commit instead.
+      - name: Build the VSIX
+        id: build
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          version="$(node scripts/version.mjs show)"
+          file="themes-of-shibbir-${version}-${SHA:0:7}.vsix"
+          pnpm exec vsce package --no-dependencies -o "$file"
+          {
+            echo "file=$file"
+            echo "version=$version"
+          } >> "$GITHUB_OUTPUT"
+
+      # A real VS Code, with its own throwaway profile and extensions folder.
+      # The command line installs and lists extensions without opening a window,
+      # so no display is needed.
+      - name: Install it into VS Code
+        env:
+          FILE: ${{ steps.build.outputs.file }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/vscode.tar.gz" "https://update.code.visualstudio.com/latest/linux-x64/stable"
+          tar -xzf "$RUNNER_TEMP/vscode.tar.gz" -C "$RUNNER_TEMP"
+          code="$RUNNER_TEMP/VSCode-linux-x64/bin/code"
+          echo "VS Code $("$code" --version | head -n 1)"
+          "$code" --user-data-dir "$RUNNER_TEMP/user" --extensions-dir "$RUNNER_TEMP/extensions" \
+            --install-extension "$FILE"
+
+      # VS Code must report the extension at this version, and every theme it
+      # contributes must have landed byte for byte as committed.
+      - name: Check what VS Code installed
+        env:
+          VERSION: ${{ steps.build.outputs.version }}
+        run: |
+          code="$RUNNER_TEMP/VSCode-linux-x64/bin/code"
+          id="$(node -p "const p = require('./package.json'); p.publisher + '.' + p.name")"
+          listed="$("$code" --user-data-dir "$RUNNER_TEMP/user" --extensions-dir "$RUNNER_TEMP/extensions" \
+            --list-extensions --show-versions)"
+          echo "$listed"
+          if ! printf '%s\n' "$listed" | grep -qx "$id@$VERSION"; then
+            echo "::error::VS Code does not list $id@$VERSION after installing the VSIX."
+            exit 1
+          fi
+          installed="$RUNNER_TEMP/extensions/$id-$VERSION"
+          failed=0
+          for theme in $(node -p "require('./package.json').contributes.themes.map((t) => t.path.replace(/^\.\//, '')).join(' ')"); do
+            if cmp -s "$theme" "$installed/$theme"; then
+              echo "OK $theme"
+            else
+              echo "::error::$theme is missing from the installed extension or differs from the committed file."
+              failed=1
+            fi
+          done
+          exit "$failed"
+
+      - name: Keep the VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: themes-of-shibbir-vsix
+          path: ${{ steps.build.outputs.file }}
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Summary
+        env:
+          FILE: ${{ steps.build.outputs.file }}
+        run: |
+          {
+            echo "### $FILE"
+            echo ''
+            echo 'Installed into VS Code and checked. Download **themes-of-shibbir-vsix** under Artifacts below,'
+            echo 'unzip it, then run "Extensions: Install from VSIX..." in VS Code and pick the .vsix.'
+            echo 'Kept for 14 days.'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A themes-only VS Code extension. There is no source code, no build step, no dependencies, and no tests. `package.json` is a pure manifest whose `contributes.themes` entries point at the artifacts that matter: the four JSON files under `themes/`.
+A themes-only VS Code extension. There is no source code, no build step, no dependencies, and no tests. `package.json` is a pure manifest whose `contributes.themes` entries point at the artifacts that matter: the two JSON files under `themes/`.
 
 ## Git
 
@@ -34,11 +34,12 @@ git grep -I -z --name-only --untracked -e '' | xargs -0 perl -CSD -ne 'print "$A
 There is no build step. The only dependencies are the packaging tools (`@vscode/vsce`, `ovsx`); `pnpm install` fetches them. `vsce` 3 needs Node 20 or newer.
 
 - **Dev loop:** press `F5` to launch an Extension Development Host (the `Extension` config in `.vscode/launch.json`, `type: extensionHost`). Edits to the theme JSON apply live in that window; no reload needed.
-- **Activate a theme** in the host window: `Cmd+K Cmd+T`, then any "Themes of Shibbir: ..." entry. Switch between them in that same picker to compare.
+- **Activate a theme** in the host window: `Cmd+K Cmd+T`, then "Themes of Shibbir: Islands Dark" or "Themes of Shibbir: Islands Light". Switch between them in that same picker to compare.
 - **Find the right scope before adding a token rule:** Command Palette → `Developer: Inspect Editor Tokens and Scopes`.
 - **Validate the themes:** `pnpm validate` (runs `scripts/validate-themes.mjs`, then `scripts/version.mjs check`). It checks that every contributed theme parses, that `name` matches its label and `type` matches `uiTheme`, that every color is valid hex and every `fontStyle` is valid, and that each sibling pair in its `PAIRS` list is structurally parallel. Add a new theme pair to `PAIRS`. The version check confirms the changelog has a dated section for the `package.json` version and the README's install example names it.
 - **Package a `.vsix`:** `pnpm package`. The `.vsix` is gitignored. Anything dev-only that should stay out of it goes in `.vscodeignore`.
-- **CI:** `.github/workflows/ci.yml` runs on every pull request and every push to `main`: it validates the themes and the version, runs the dash check below, packages the `.vsix`, fails if the package holds anything besides `package.json`, `README.md`, `CHANGELOG.md`, `LICENSE`, `icon.png`, and `themes/*.json`, and uploads the `.vsix` as a build artifact. `publish.yml` runs the same checks before publishing.
+- **CI:** `.github/workflows/ci.yml` runs on every pull request and every push to `main`: it validates the themes and the version, runs the dash check below, packages the `.vsix`, fails if the package holds anything besides `package.json`, `README.md`, `CHANGELOG.md`, `LICENSE`, `icon.png`, and `themes/*.json`. `publish.yml` runs the same checks before publishing.
+- **Try a pull request's build:** `.github/workflows/vsix.yml` ("VSIX package") runs on every pull request, apart from CI so it can never hold up a release. It builds `themes-of-shibbir-<version>-<sha>.vsix`, installs it into a freshly downloaded VS Code with a throwaway profile, fails unless VS Code lists the extension at that version and every contributed theme landed byte for byte, and keeps the `.vsix` for 14 days as the run's `themes-of-shibbir-vsix` artifact. Download it from the pull request's checks, unzip it, and use "Extensions: Install from VSIX...". Run it by hand from the Actions tab for any branch.
 - **Install locally without packaging:** copy the folder into `~/.vscode/extensions` and restart VS Code.
 
 ## Releasing
@@ -57,20 +58,20 @@ To inspect locally: `node scripts/version.mjs show`, `level` (what `auto` would 
 
 ## The themes
 
-The extension contributes four themes, registered in `contributes.themes` in `package.json`. Adding another means adding an entry there plus a file under `themes/`; nothing else wires them up. A light theme takes `"uiTheme": "vs"` in `package.json` and `"type": "light"` in its file.
+The extension contributes two themes, registered in `contributes.themes` in `package.json`. Adding another means adding an entry there plus a file under `themes/`; nothing else wires them up. A light theme takes `"uiTheme": "vs"` in `package.json` and `"type": "light"` in its file.
 
 | Label in the picker | File | Character |
 | --- | --- | --- |
-| Themes of Shibbir: Dark Solid | `themes/dark-solid-color-theme.json` | one flat surface color everywhere, vivid saturated syntax |
-| Themes of Shibbir: Dark Shades | `themes/dark-shades-color-theme.json` | layered surfaces at five depths, muted desaturated syntax |
 | Themes of Shibbir: Islands Dark | `themes/islands-dark-color-theme.json` | island surfaces on a lighter frame, warm calm syntax |
 | Themes of Shibbir: Islands Light | `themes/islands-light-color-theme.json` | white islands on a gray frame, crisp dark syntax |
 
 Every theme label carries the `Themes of Shibbir: ` prefix so all of them group together in the Color Theme picker, which sorts alphabetically. Keep that prefix on any theme added later, and keep the `name` inside each JSON file identical to its `label` in `package.json`.
 
-They are **independent palettes**, not variants of each other. A color change in one does not imply the same change in another. That holds for the Islands pair too: Islands Dark and Islands Light are two separate palettes, not one palette inverted.
+Islands Dark and Islands Light are **two separate palettes** for the same layout, not one palette inverted. A color change in one does not imply the same change in the other.
 
 Each file has four parts: `colors` for workbench chrome, `tokenColors` for TextMate scope rules, `semanticTokenColors` for language-server tokens, and `"type"` plus `"semanticHighlighting": true` at the top.
+
+Version 0.1.0 removed two earlier skeleton themes, Dark Solid and Dark Shades. Do not reintroduce their files or palettes.
 
 ### Why the engine floor is 1.12, and why it stays there
 
@@ -85,18 +86,16 @@ Neither case errors, warns, or blocks installation. The precedent is Dracula, a 
 
 The floor was briefly raised to `^1.43.0` and deliberately reverted. Maximum installability, including on forks and pinned corporate installs that report older base versions, is worth more here than declaring an exact feature floor. Raise it only if a theme ever depends on something that genuinely breaks when absent.
 
-### Current state: two skeletons, two complete themes
+### Current state: complete
 
-**Dark Solid and Dark Shades are skeletons.** Each carries `editor.background`, `editor.foreground`, `sideBar.background`, a single `comment` token rule, and a full `semanticTokenColors` block. Shibbir extends them incrementally, so **do not bulk-generate rules into these two files unless asked**. Add what the current task needs and nothing more. Their `semanticTokenColors` block is the one exception to that minimalism: it was filled in on request, and it draws every value from the reference palettes below.
-
-**Islands Dark and Islands Light are complete.** They were built on request against the official VS Code theme color reference (`api/references/theme-color.md` in `microsoft/vscode-docs`): every key in it is set except the seven listed under "Islands themes: how the colors were mapped" below. They also carry a full `tokenColors` rule set (60 rules) and an extended `semanticTokenColors` block. When VS Code adds new color keys, add them to both Islands files in the same position the reference lists them.
+Both themes are complete. They were built against the official VS Code theme color reference (`api/references/theme-color.md` in `microsoft/vscode-docs`): every key in it is set except the seven listed under "How the colors were mapped" below. They also carry a full `tokenColors` rule set (60 rules) and an extended `semanticTokenColors` block. When VS Code adds new color keys, add them to both files in the same position the reference lists them.
 
 Conventions to preserve:
 
-- **Keep each pair structurally parallel.** Dark Solid and Dark Shades mirror each other; Islands Dark and Islands Light mirror each other. Within a pair: same workbench keys, same token rule names and scopes, same `settings` keys, in the same order. Only the values differ. If you add a rule to one file of a pair, add the matching rule to the other, or the files stop being diffable against each other. (Islands Dark sets the comment `fontStyle` to `""` rather than dropping the key, because that theme deliberately keeps comments upright.)
-- **Keep each theme's identity in its surfaces.** Dark Solid uses one flat value for every surface key, which is why `sideBar.background` currently equals `editor.background`. Dark Shades layers its surfaces, which is why its two differ. The Islands themes use two surface values: the island color for content (editor, sidebar, panel, terminal, tabs) and a frame color around them (title bar, activity bar, status bar, and the borders between islands). Any surface key added later has to respect that: identical values in solid, stepped values in shades, island-or-frame in the Islands themes.
+- **Keep the two files structurally parallel.** Same workbench keys, same token rule names and scopes, same `settings` keys, in the same order. Only the values differ. If you add a rule to one, add the matching rule to the other, or the files stop being diffable against each other; `pnpm validate` enforces this through the `PAIRS` list in `scripts/validate-themes.mjs`. (Islands Dark sets the comment `fontStyle` to `""` rather than dropping the key, because that theme deliberately keeps comments upright.)
+- **Keep the identity in the surfaces.** Each theme uses two surface values: the island color for content (editor, sidebar, panel, terminal, tabs) and a frame color around them (title bar, activity bar, status bar, and the borders between islands). Any surface key added later takes one or the other.
 
-### Islands themes: how the colors were mapped
+### How the colors were mapped
 
 - **Roles, not one-offs.** Every value plays a named role from the palette tables below (island, frame, accent, selection, syntax role, and so on). Reuse the hex for that role rather than introducing a new one.
 - **Terminal ANSI colors** have their own set of values per theme; reuse them as they are.
@@ -114,41 +113,7 @@ Keys deliberately left unset, so VS Code keeps its own behavior:
 
 Two notes on syntax: bracket pair colorization uses three hues from the syntax palette (tag, field, function); and function calls take the declaration color in TextMate rules, since most grammars do not separate calls from declarations.
 
-The tables below are the **reference palettes**. For Dark Solid and Dark Shades they are not an inventory of what the files contain today. They record the intended role for each hex so colors stay consistent as rules are added. Reuse a hex from the relevant table rather than introducing a new one.
-
-### Dark Solid palette
-
-Surfaces are deliberately uniform. As surface keys get added (`activityBar`, `panel`, `statusBar`, `titleBar`, both tab states), they all take `#1E2227`, separated only by `#2C3238` borders. Introducing a second surface color defeats the point of the theme.
-
-| Color | Role |
-| --- | --- |
-| `#D9E0E8` | default foreground |
-| `#5C6773` | comments (italic), tag punctuation, quotes |
-| `#C678DD` | keywords, storage, `variable.language` (italic) |
-| `#56B6C2` | operators, punctuation, escapes, regex, links |
-| `#61AFEF` | functions, decorators, CSS property names, headings |
-| `#98C379` | strings, raw code, diff inserted |
-| `#D19A66` | numbers, constants, parameters, attributes, bold |
-| `#E5C07B` | classes, types, CSS classes, PHP namespaces, diff changed |
-| `#E06C75` | variables, tags, diff deleted |
-| `#FF5370` | invalid |
-
-### Dark Shades palette
-
-Surfaces step through five depths, darkest chrome to lightest editor: `#10151A` status bar, `#12171C` activity and title bar, `#151B21` panel and terminal, `#161C22` sidebar and widgets, `#1B222A` editor. Only the editor and sidebar steps exist in the file so far. That ordering is the theme's identity; place any new surface key at its correct depth.
-
-| Color | Role |
-| --- | --- |
-| `#C3CBD5` | default foreground |
-| `#556070` | comments (italic), tag punctuation, quotes |
-| `#A98CC8` | keywords, storage, `variable.language` (italic) |
-| `#6FA3A8` | operators, punctuation, escapes, regex, links |
-| `#7BA7CC` | functions, decorators, CSS property names, headings |
-| `#8FB98A` | strings, raw code, diff inserted |
-| `#C39B72` | numbers, constants, parameters, attributes, bold |
-| `#C9B285` | classes, types, CSS classes, PHP namespaces, diff changed |
-| `#C08A8F` | variables, tags, diff deleted |
-| `#C96A6A` | invalid |
+The tables below are the **reference palettes**: the role of each hex. Reuse a hex from the relevant table rather than introducing a new one.
 
 ### Islands Dark palette
 
@@ -198,7 +163,7 @@ Neither theme colors JSON keys by nesting depth yet. If that gets added, the sel
 
 `sample-files/` holds fixtures for visually checking the theme across roughly fifty languages and formats: web code, six CSS dialects, seventeen backend languages, data and config formats, and tooling files. Open them in the Extension Development Host after pressing `F5`. `sample-files/README.md` maps each file to the scopes it covers.
 
-Check every change in **every** theme it touches, and when a rule is added to all four files, look at all four. The fixtures are shared, so switching themes with the same file open is the fastest side-by-side comparison you get.
+Check every change in **both** themes. The fixtures are shared, so switching themes with the same file open is the fastest side-by-side comparison you get.
 
 Three fixtures reach rules nothing else does:
 
@@ -206,10 +171,12 @@ Three fixtures reach rules nothing else does:
 - `sample.php` is the only fixture covering the PHP-specific scopes.
 - `sample.diff` is the only fixture covering `markup.inserted`, `markup.deleted`, and `markup.changed`.
 
-The Islands themes name six CSS dialects in their property-name and selector rules (`css`, `sass`, `scss`, `less`, `stylus`, `postcss`), which is why there are six stylesheet fixtures rather than one. Any CSS rule added to Dark Solid or Dark Shades should name the same six.
+The Islands themes name six CSS dialects in their property-name and selector rules (`css`, `sass`, `scss`, `less`, `stylus`, `postcss`), which is why there are six stylesheet fixtures rather than one.
 
 The folder is excluded from the packaged `.vsix`.
 
 ## Metadata files
 
-`README.md`, `CHANGELOG.md`, and `vsc-extension-quickstart.md` are still generator boilerplate. `.vscodeignore` keeps `.vscode/**`, `.gitignore`, and the quickstart out of the packaged `.vsix`; add new dev-only files there.
+`README.md` is the Marketplace and Open VSX listing page as well as the GitHub one. `CHANGELOG.md` follows Keep a Changelog and feeds the release notes (see Releasing). `vsc-extension-quickstart.md` is still generator boilerplate. `.vscodeignore` keeps dev-only files (`.vscode/**`, `.github/**`, `scripts/**`, `tools/**`, `images/**`, `sample-files/**`, and so on) out of the packaged `.vsix`; add new dev-only paths there, or CI's package contents check fails.
+
+`images/` holds the README screenshots, one per Islands theme. They stay out of the `.vsix`: `vsce` rewrites relative image links in the README to `https://github.com/shibbirweb/themes-of-shibbir/raw/HEAD/...`, so the listing pages load them from GitHub, and they only appear there once they are on `main`. They are real VS Code renders, not mockups: VS Code Insiders with a throwaway profile (`--user-data-dir`, `--extensions-dir`) and the packaged `.vsix` installed, `sample-files/` open with `react-component.tsx` active, a 1440x900 window at 2x scale, and the integrated terminal showing real `git` output. Retake both when a theme's look changes. Keep the profile path short: macOS caps socket paths at 103 characters and VS Code puts its IPC socket inside the profile folder.

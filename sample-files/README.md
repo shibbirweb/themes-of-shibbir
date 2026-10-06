@@ -2,9 +2,9 @@
 
 Test fixtures for eyeballing the themes. Open these in the Extension Development
 Host (`F5`), then check each file under **both** contributed themes: "Themes of
-Shibbir: Dark Solid" and "Themes of Shibbir: Dark Shades". Switching themes with
-the same file open, via `Cmd+K Cmd+T`, is the fastest side-by-side comparison
-available.
+Shibbir: Islands Dark" and "Themes of Shibbir: Islands Light". Switching themes
+with the same file open, via `Cmd+K Cmd+T`, is the fastest side-by-side
+comparison available.
 
 The two themes are independent palettes, so a construct that reads well in one
 can still be wrong in the other.
@@ -26,8 +26,10 @@ here is wired into a build; they exist only to be looked at.
 
 ## Stylesheets
 
-The theme names five CSS dialects explicitly in its property-name rule, so each
-gets its own file. Property names should render `#B2CCD6` in all of them.
+Both themes name six CSS dialects explicitly in their property-name rule (`css`,
+`sass`, `scss`, `less`, `stylus`, `postcss`), so each gets its own file. Property
+names should render `#C77DBB` in Islands Dark and `#871094` in Islands Light in
+all of them.
 
 | File | Covers |
 | --- | --- |
@@ -107,20 +109,23 @@ gets its own file. Property names should render `#B2CCD6` in all of them.
 - **`sample.diff`** is the fastest check for the `markup.inserted`,
   `markup.deleted`, and `markup.changed` rules, which are otherwise only visible
   in a live git diff.
-- **`sample.csv`** doubles as the reference palette for both themes: one row per
-  intended token rule, with the Dark Solid and Dark Shades hex side by side. The
-  theme files are skeletons being built up over time, so treat this as the target
-  rather than a description of what they currently contain. It covers TextMate
-  `tokenColors` only; `semanticTokenColors` is a separate mechanism and is
-  already fully defined in both theme files.
+- **`sample.csv`** doubles as the token palette for both themes: one row per
+  `tokenColors` rule, in file order, with its first scope, the Islands Dark and
+  Islands Light hex side by side, and each theme's font style. It is generated
+  from the theme files, so regenerate it when a rule changes. It covers TextMate
+  `tokenColors` only; `semanticTokenColors` is a separate mechanism defined in
+  both theme files.
 - **`typescript.ts`** is the fixture for semantic highlighting. TypeScript ships
   a semantic token provider, so classes, interfaces, enums, decorators, and
   `readonly` members there resolve through `semanticTokenColors` rather than
   through the TextMate rules. `Developer: Inspect Editor Tokens and Scopes` shows
   a "semantic token type" line when that is happening.
-- **Italic rules** are comments, `variable.language` (`this`, `self`, `$this`),
-  decorators, markdown italic, and markdown quotes, so confirm your font has a
-  real italic face. `invalid.deprecated` is the only strikethrough rule.
+- **Italic rules** in both themes are doc comments, constants, static members,
+  markdown headings, markdown italic, and fenced code language names. Islands
+  Light also italicises plain comments and doc comment tag values; Islands Dark
+  keeps plain comments upright. Confirm your font has a real italic face.
+  `invalid.deprecated` and markdown strikethrough are the only strikethrough
+  rules.
 - **`Makefile`** recipes must stay tab-indented. If your editor converts tabs to
   spaces on save, the file stops being a valid Makefile even though it still
   highlights correctly.
