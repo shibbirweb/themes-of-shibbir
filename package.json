@@ -2,7 +2,7 @@
   "name": "themes-of-shibbir",
   "displayName": "Themes of Shibbir",
   "description": "Themes of Md. Shibbir Ahmed",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "shibbirweb",
   "icon": "icon.png",
   "packageManager": "pnpm@11.9.0",
