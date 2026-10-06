@@ -1,10 +1,12 @@
 # Themes of Shibbir
 
-[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/shibbirweb.themes-of-shibbir?label=Marketplace&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/shibbirweb.themes-of-shibbir?label=Installs&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/shibbirweb.themes-of-shibbir?label=Rating&color=1E2227)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir&ssr=false#review-details)
-[![Open VSX](https://img.shields.io/open-vsx/v/shibbirweb/themes-of-shibbir?label=Open%20VSX&color=1B222A)](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
-[![License](https://img.shields.io/badge/License-MIT-1B222A)](LICENSE)
+[![VS Marketplace version](https://img.shields.io/visual-studio-marketplace/v/shibbirweb.themes-of-shibbir?label=VS%20Marketplace&labelColor=191A1C&color=3871E1)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
+[![VS Marketplace installs](https://img.shields.io/visual-studio-marketplace/i/shibbirweb.themes-of-shibbir?label=Installs&labelColor=191A1C&color=3871E1)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir)
+[![VS Marketplace rating](https://img.shields.io/visual-studio-marketplace/r/shibbirweb.themes-of-shibbir?label=Rating&labelColor=191A1C&color=3871E1)](https://marketplace.visualstudio.com/items?itemName=shibbirweb.themes-of-shibbir&ssr=false#review-details)
+[![Open VSX version](https://img.shields.io/open-vsx/v/shibbirweb/themes-of-shibbir?label=Open%20VSX&labelColor=191A1C&color=3871E1)](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
+[![Open VSX downloads](https://img.shields.io/open-vsx/dt/shibbirweb/themes-of-shibbir?label=Open%20VSX%20downloads&labelColor=191A1C&color=3871E1)](https://open-vsx.org/extension/shibbirweb/themes-of-shibbir)
+[![CI](https://img.shields.io/github/actions/workflow/status/shibbirweb/themes-of-shibbir/ci.yml?branch=main&label=CI&labelColor=191A1C&color=3871E1)](https://github.com/shibbirweb/themes-of-shibbir/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-3871E1?labelColor=191A1C)](LICENSE)
 
 Four themes for Visual Studio Code: two dark themes built around different
 ideas about depth, plus the Islands pair, one dark and one light.
@@ -24,6 +26,8 @@ contrast on screen.
 Pick this if you find layered chrome noisy and want your attention pulled
 entirely to the text.
 
+![Themes of Shibbir: Islands Dark, showing the explorer, a React component, and the integrated terminal](images/islands-dark.png)
+
 ### Themes of Shibbir: Dark Shades
 
 Surfaces step through five distinct depths, from the darkest status bar up to the
@@ -31,6 +35,8 @@ lightest editor background. Syntax colors are muted and desaturated to match.
 
 Pick this if you like being able to tell panes apart at a glance without reading
 them, and prefer a softer palette for long sessions.
+![Themes of Shibbir: Islands Light, showing the explorer, a React component, and the integrated terminal](images/islands-light.png)
+
 
 ### Themes of Shibbir: Islands Dark
 

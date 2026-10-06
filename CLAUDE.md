@@ -212,4 +212,6 @@ The folder is excluded from the packaged `.vsix`.
 
 ## Metadata files
 
-`README.md`, `CHANGELOG.md`, and `vsc-extension-quickstart.md` are still generator boilerplate. `.vscodeignore` keeps `.vscode/**`, `.gitignore`, and the quickstart out of the packaged `.vsix`; add new dev-only files there.
+`README.md` is the Marketplace and Open VSX listing page as well as the GitHub one. `CHANGELOG.md` follows Keep a Changelog and feeds the release notes (see Releasing). `vsc-extension-quickstart.md` is still generator boilerplate. `.vscodeignore` keeps dev-only files (`.vscode/**`, `.github/**`, `scripts/**`, `tools/**`, `images/**`, `sample-files/**`, and so on) out of the packaged `.vsix`; add new dev-only paths there, or CI's package contents check fails.
+
+`images/` holds the README screenshots, one per Islands theme. They stay out of the `.vsix`: `vsce` rewrites relative image links in the README to `https://github.com/shibbirweb/themes-of-shibbir/raw/HEAD/...`, so the listing pages load them from GitHub, and they only appear there once they are on `main`. They are real VS Code renders, not mockups: VS Code Insiders with a throwaway profile (`--user-data-dir`, `--extensions-dir`) and the packaged `.vsix` installed, `sample-files/` open with `react-component.tsx` active, a 1440x900 window at 2x scale, and the integrated terminal showing real `git` output. Retake both when a theme's look changes. Keep the profile path short: macOS caps socket paths at 103 characters and VS Code puts its IPC socket inside the profile folder.
